@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Chat</string>
+    <string name="gender_hint">Select Gender</string>
 </resources>
