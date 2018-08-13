@@ -7,12 +7,13 @@
     tools:context=".MainActivity">
 
 
+
     <android.support.constraint.ConstraintLayout
         android:id="@+id/signInFrame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible"
         android:animateLayoutChanges="true"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -82,11 +83,12 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="22dp"
             android:layout_marginStart="22dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:gravity="center"
+            android:padding="10dp"
             android:text="Sign up"
             android:textAllCaps="false"
-            android:textColor="#4152b6"
+            android:textColor="@color/text_button_hover"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -124,9 +126,9 @@
         android:id="@+id/signUpFrame"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:animateLayoutChanges="true"
         android:paddingBottom="0dp"
         android:paddingTop="0dp"
-        android:animateLayoutChanges="true"
         android:scrollbarStyle="outsideOverlay"
         android:translationX="1000dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -138,7 +140,7 @@
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:paddingBottom="5dp"
             android:paddingTop="5dp"
@@ -211,11 +213,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="22dp"
                 android:layout_marginStart="22dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="10dp"
                 android:gravity="center"
                 android:text="Sign In"
+                android:padding="10dp"
                 android:textAllCaps="false"
-                android:textColor="#4152b6"
+                android:textColor="@color/text_button_hover"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
@@ -256,6 +259,7 @@
                 android:layout_marginTop="8dp"
                 android:background="@drawable/sign_border"
                 android:entries="@array/spinnerGender"
+                android:dropDownWidth="600dp"
                 android:padding="5dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -310,5 +314,24 @@
 
         </android.support.constraint.ConstraintLayout>
     </ScrollView>
+
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/loader"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#97000000"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:indeterminateTint="#fff"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </android.support.constraint.ConstraintLayout>
 
 </android.support.constraint.ConstraintLayout>
