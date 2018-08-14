@@ -16,7 +16,7 @@ class Profile : Fragment() {
        val rootView= inflater.inflate(R.layout.fragment_profile, container, false)
         rootView.exitChat.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
-            activity!!.finish()
+            this.activity!!.finish()
         }
         return rootView
     }

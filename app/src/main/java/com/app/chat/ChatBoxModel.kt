@@ -1,20 +1,20 @@
 package com.app.chat
 
-import android.support.v7.widget.RecyclerView
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import kotlinx.android.synthetic.main.chatbox_layout.view.*
-import java.sql.Timestamp
 
 class ChatBoxModel {
     var lastMessage:String?=null
     var timestamp:Int?=null
-    var with:String?=null
+    var withId:String?=null
+    var withName:String?=null
+    var photo:String?=null
+    var id:String?=null
     constructor(){}
-    constructor(lastMessage:String?,timestamp:Int?,with:String?){
+    constructor(lastMessage:String?,timestamp:Int?,withId:String?,withName:String?,photo:String?,id:String?){
         this.lastMessage = lastMessage
         this.timestamp = timestamp
-        this.with = with
+        this.withId = withId
+        this.withName = withName
+        this.photo = photo
+        this.id = id
     }
 }

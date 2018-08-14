@@ -3,18 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="75dp"
+    android:layout_height="80dp"
     android:background="@drawable/layout_border"
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground"
-    android:clickable="true"
-    >
+    android:clickable="true">
 
     <ImageView
-        android:id="@+id/profilePic"
+        android:id="@+id/chatPhoto"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginStart="10dp"
+        android:background="@drawable/image_round"
+        android:scaleType="centerInside"
+        android:adjustViewBounds="true"
+        android:layout_weight="0"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -25,13 +28,13 @@
         android:id="@+id/chatBoxName"
         android:layout_width="wrap_content"
         android:layout_height="22dp"
-        android:layout_marginStart="5dp"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:text="TextView"
         android:textColor="#000"
         android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@+id/profilePic"
-        app:layout_constraintTop_toTopOf="@+id/profilePic" />
+        app:layout_constraintStart_toEndOf="@+id/chatPhoto"
+        app:layout_constraintTop_toTopOf="@+id/chatPhoto" />
 
 
     <TextView
@@ -39,10 +42,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:layout_marginStart="5dp"
+        android:layout_marginStart="10dp"
         android:text="TextView"
         android:textColor="#515151"
-        app:layout_constraintBottom_toBottomOf="@+id/profilePic"
-        app:layout_constraintStart_toEndOf="@+id/profilePic" />
+        app:layout_constraintBottom_toBottomOf="@+id/chatPhoto"
+        app:layout_constraintStart_toEndOf="@+id/chatPhoto" />
 
 </android.support.constraint.ConstraintLayout>

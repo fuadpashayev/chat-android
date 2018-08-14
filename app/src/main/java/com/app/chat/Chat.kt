@@ -3,22 +3,24 @@ package com.app.chat
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Message
 import android.support.v4.app.Fragment
-import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.firebase.ui.database.FirebaseRecyclerAdapter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.chatbox_layout.view.*
-import kotlinx.android.synthetic.main.fragment_chat.*
 import kotlinx.android.synthetic.main.fragment_chat.view.*
+import android.graphics.BitmapFactory
+import android.graphics.Bitmap
+import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.URL
 
 
 class Chat : Fragment() {
@@ -29,30 +31,13 @@ class Chat : Fragment() {
         val boxes:ArrayList<String> = arrayListOf("test1","test2","aloha")
         auth = FirebaseAuth.getInstance()
         user = auth!!.currentUser
-        val ChatData:ArrayList<String>? = arrayListOf()
+
+
+
+
+
 
         val query = FirebaseDatabase.getInstance().getReference("users/${user!!.uid}/chats")
-//        query.addValueEventListener(object:ValueEventListener{
-//            override fun onDataChange(snap: DataSnapshot?) {
-//                val data = snap!!.children.iterator()
-//
-//                for(i in data){
-//                    val chatData = i.getValue(ChatBoxModel::class.java)
-//                    ChatData!!.add(chatData!!.lastMessage!!)
-//                }
-//                rootView.chatBoxes.layoutManager = LinearLayoutManager(context)
-//                rootView.chatBoxes.adapter = ChatBoxAdapter(ChatData!!)
-//
-//            }
-//
-//            override fun onCancelled(p0: DatabaseError?) {}
-//        })
-
-
-
-
-
-
 
         val firebaseRecyclerAdapter = object : FirebaseRecyclerAdapter<ChatBoxModel, ChatBoxViewHolder>(
                 ChatBoxModel::class.java,
@@ -65,10 +50,24 @@ class Chat : Fragment() {
             override fun populateViewHolder(viewHolder: ChatBoxViewHolder?, model: ChatBoxModel?, position: Int) {
                 rootView.loader.visibility = View.GONE
                 viewHolder!!.itemView.chatBoxMessage.text = model!!.lastMessage
-                viewHolder.itemView.chatBoxName.text = model.with
+                val imgHolder = viewHolder.itemView.chatPhoto
+                imgHolder.setClipToOutline(true)
+
+                Glide.with(context!!)
+                        .load(model.photo)
+                        .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                        .thumbnail(Glide.with(context!!).load(R.mipmap.loader))
+                        .fitCenter()
+                        .centerCrop()
+                        .crossFade(1000)
+                        .into(imgHolder)
+                viewHolder.itemView.chatBoxName.text = model.withName
                 viewHolder.itemView.setOnClickListener {
                     val intent = Intent(activity,Messages::class.java)
-                    intent.putExtra("with",model.with)
+                    intent.putExtra("withId",model.withId)
+                    intent.putExtra("withName",model.withName)
+                    intent.putExtra("withPhoto",model.photo)
+                    intent.putExtra("chatId",model.id)
                     startActivity(intent)
                 }
             }
@@ -83,9 +82,6 @@ class Chat : Fragment() {
 
         return rootView
     }
-
-
-
 
 
 

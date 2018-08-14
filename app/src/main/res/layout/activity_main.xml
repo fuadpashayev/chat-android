@@ -50,7 +50,7 @@
             android:background="@drawable/sign_border"
             android:ems="10"
             android:hint="Password"
-            android:inputType="text"
+            android:inputType="textPassword"
             android:paddingStart="35dp"
             android:textCursorDrawable="@null"
             android:textSize="13dp"
@@ -120,6 +120,19 @@
             app:layout_constraintTop_toTopOf="@+id/login_pass"
             app:srcCompat="@drawable/ic_pass" />
 
+        <ImageView
+            android:id="@+id/showPassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            android:padding="13dp"
+            android:tint="#333"
+            app:layout_constraintBottom_toBottomOf="@+id/login_pass"
+            app:layout_constraintEnd_toEndOf="@+id/login_pass"
+            app:layout_constraintTop_toTopOf="@+id/login_pass"
+            app:srcCompat="@drawable/ic_show" />
+
     </android.support.constraint.ConstraintLayout>
 
     <ScrollView
@@ -143,7 +156,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:paddingBottom="5dp"
-            android:paddingTop="5dp"
+            android:paddingTop="30dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -180,7 +193,7 @@
                 android:background="@drawable/sign_border"
                 android:ems="10"
                 android:hint="Password"
-                android:inputType="textPassword"
+                android:inputType="text"
                 android:paddingStart="35dp"
                 android:textCursorDrawable="@null"
                 android:textSize="13dp"
