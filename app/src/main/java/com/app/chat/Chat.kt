@@ -16,11 +16,9 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.chatbox_layout.view.*
 import kotlinx.android.synthetic.main.fragment_chat.view.*
-import android.graphics.BitmapFactory
-import android.graphics.Bitmap
-import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.URL
+
+
+
 
 
 class Chat : Fragment() {
@@ -28,14 +26,8 @@ class Chat : Fragment() {
     var user:FirebaseUser?=null
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_chat, container, false)
-        val boxes:ArrayList<String> = arrayListOf("test1","test2","aloha")
         auth = FirebaseAuth.getInstance()
         user = auth!!.currentUser
-
-
-
-
-
 
         val query = FirebaseDatabase.getInstance().getReference("users/${user!!.uid}/chats")
 
@@ -63,6 +55,7 @@ class Chat : Fragment() {
                         .into(imgHolder)
                 viewHolder.itemView.chatBoxName.text = model.withName
                 viewHolder.itemView.setOnClickListener {
+                    (activity as Home).changeActivity = true
                     val intent = Intent(activity,Messages::class.java)
                     intent.putExtra("withId",model.withId)
                     intent.putExtra("withName",model.withName)
@@ -82,6 +75,8 @@ class Chat : Fragment() {
 
         return rootView
     }
+
+
 
 
 

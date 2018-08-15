@@ -12,6 +12,8 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.message_layout.view.*
 import java.security.AccessController.getContext
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class messageAdapter(var messages:ArrayList<MessageModel>,var withPhoto:String?,var messagesActivity:Activity): RecyclerView.Adapter<MessageViewHolder>(){
@@ -52,6 +54,15 @@ class messageAdapter(var messages:ArrayList<MessageModel>,var withPhoto:String?,
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
         holder.view.messageText.text = data!!.message
+        holder.view.messageTime.text = date("HH:mm",data!!.timestamp!!.toLong())
+    }
+    fun date(pattern:String,timestamp: Long): String {
+        val date = Date(timestamp * 1000L)
+        // format of the date
+        val jdf = SimpleDateFormat(pattern)
+        jdf.timeZone = TimeZone.getTimeZone("GMT-4")
+        val java_date = jdf.format(date)
+        return java_date
     }
 
 

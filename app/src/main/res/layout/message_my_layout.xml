@@ -4,39 +4,65 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="5dp">
+    android:padding="5dp"
+    android:paddingEnd="10dp"
+    android:paddingStart="65dp">
 
 
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/constraintLayout2"
+    <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="10dp"
-        android:background="@drawable/message_border"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/imageView"
+        android:background="@drawable/message_my_border"
+        android:backgroundTint="#ededed"
         android:clickable="true"
         android:focusable="true"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:paddingEnd="20dp"
+        android:foreground="@drawable/message_my_selector"
+        android:maxWidth="200dp"
+        android:orientation="horizontal"
+        android:paddingEnd="10dp"
         android:paddingStart="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+
+        <TextView
+            android:id="@+id/messageTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/txtMsgFrom"
+            android:layout_alignRight="@+id/txtMsgFrom"
+            android:layout_below="@+id/txtMsgFrom"
+            android:layout_gravity="bottom|right"
+            android:padding="4dp"
+            android:paddingRight="25dp"
+            android:text="Time"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="10dp" />
+
         <TextView
             android:id="@+id/messageText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:text="TextView"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </android.support.constraint.ConstraintLayout>
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignTop="@+id/imageView"
+            android:layout_gravity="left|center_vertical"
+            android:layout_marginEnd="30dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="0dp"
+            android:layout_toEndOf="@+id/lblMsgFrom"
+            android:layout_toRightOf="@+id/imageView"
+            android:paddingBottom="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="5dp"
+            android:text="kdfjhgjfhf"
+            android:textColor="#000000"
+            android:textSize="16dp" />
+    </FrameLayout>
 
     <ImageView
         android:id="@+id/messageCPhoto"
