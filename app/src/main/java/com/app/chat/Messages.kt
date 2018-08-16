@@ -1,16 +1,22 @@
 package com.app.chat
 
 
+import android.content.Context
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_message.*
+import kotlinx.android.synthetic.main.message_my_layout.view.*
 import java.util.*
 import java.text.SimpleDateFormat
 
@@ -23,7 +29,9 @@ class Messages : AppCompatActivity() {
     var auth:FirebaseAuth?=null
     var user:FirebaseUser?=null
     var messageAdapterList = ArrayList<MessageModel>()
+    var initalLoad = false
     var changeActivity = false
+    var childAdded=0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_message)
@@ -49,9 +57,18 @@ class Messages : AppCompatActivity() {
         val query = FirebaseDatabase.getInstance().getReference("messages/$chatId")
         query.addChildEventListener(object:ChildEventListener{
             override fun onChildAdded(snap: DataSnapshot?, p1: String?) {
+
                 val a = snap!!.getValue(MessageModel::class.java)
+            if(messageAdapterList.size>0) {
+                if (messageAdapterList.get(childAdded).timestamp != a!!.timestamp) {
+                    messageAdapterList.add(a!!)
+                }
+                childAdded++
+            }else{
                 messageAdapterList.add(a!!)
-                messages.adapter = messageAdapter(messageAdapterList,withPhoto,this@Messages)
+            }
+
+
             }
             override fun onChildChanged(snap: DataSnapshot?, p1: String?) {}
             override fun onChildRemoved(p0: DataSnapshot?) {}
@@ -59,6 +76,9 @@ class Messages : AppCompatActivity() {
             override fun onChildMoved(p0: DataSnapshot?, p1: String?) {}
 
         })
+        messages.setHasFixedSize(true)
+        messages.adapter = messageAdapter(messageAdapterList, withPhoto, this@Messages, messages)
+
         updateExit("enter")
         backToHome.setOnClickListener {
             backToHome()
@@ -103,6 +123,39 @@ class Messages : AppCompatActivity() {
             override fun onCancelled(p0: DatabaseError?) {}
 
         })
+
+        class newMessage {
+            var byId:String?=null
+            var message:String?=null
+            var seen:Int?=null
+            var timestamp:Long?=null
+            var toId:String?=null
+            var id:String?=null
+            constructor(){}
+            constructor(byId:String?,message:String?,seen:Int?,timestamp:Long?,toId:String?,id:String?){
+                this.byId = byId
+                this.message = message
+                this.seen = seen
+                this.timestamp = timestamp
+                this.toId = toId
+                this.id = id
+            }
+        }
+
+        sendMessage.setOnClickListener {
+            val message = messageBox.text.trim().toString()
+
+            messageAdapterList.add(MessageModel(user!!.uid,message,0,(System.currentTimeMillis()/1000).toInt(),withId,"null"))
+            if(initalLoad)
+                messages.adapter!!.notifyDataSetChanged()
+            messages.scrollToPosition(messages.adapter!!.itemCount-1)
+
+            val query = FirebaseDatabase.getInstance().getReference("messages/${chatId}").push()
+            val key = query.key
+            query.setValue(newMessage(user!!.uid,message, 0,System.currentTimeMillis()/1000,withId,key))
+            messageBox.text.clear()
+
+        }
     }
 
     fun getDate(timestamp: Long): String {
