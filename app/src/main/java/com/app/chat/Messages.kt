@@ -2,16 +2,29 @@ package com.app.chat
 
 
 import android.content.Context
+import android.graphics.PointF
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.support.constraint.ConstraintLayout
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.LinearSmoothScroller
+import android.support.v7.widget.RecyclerView
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.DisplayMetrics
 import android.util.Log
+import android.util.TypedValue
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
@@ -29,9 +42,9 @@ class Messages : AppCompatActivity() {
     var auth:FirebaseAuth?=null
     var user:FirebaseUser?=null
     var messageAdapterList = ArrayList<MessageModel>()
-    var initalLoad = false
+    var initialLoad = false
     var changeActivity = false
-    var childAdded=0
+    var childAdded=false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_message)
@@ -55,19 +68,36 @@ class Messages : AppCompatActivity() {
                 .into(messagePhoto)
 
         val query = FirebaseDatabase.getInstance().getReference("messages/$chatId")
-        query.addChildEventListener(object:ChildEventListener{
-            override fun onChildAdded(snap: DataSnapshot?, p1: String?) {
+        messageBox.requestFocus()
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
-                val a = snap!!.getValue(MessageModel::class.java)
-            if(messageAdapterList.size>0) {
-                if (messageAdapterList.get(childAdded).timestamp != a!!.timestamp) {
-                    messageAdapterList.add(a!!)
+        query.limitToLast(1).addListenerForSingleValueEvent(object:ValueEventListener{
+            override fun onCancelled(p0: DatabaseError?) {}
+            override fun onDataChange(data: DataSnapshot?) {
+                if(!data!!.exists()){
+                    loader.visibility = View.GONE
+                }else {
+                    loader.visibility = View.VISIBLE
+                    initialLoad = true
                 }
-                childAdded++
-            }else{
-                messageAdapterList.add(a!!)
             }
 
+        })
+        query.addChildEventListener(object:ChildEventListener{
+            override fun onChildAdded(snap: DataSnapshot?, p1: String?) {
+                initialLoad = true
+                loader.visibility = View.GONE
+                val data = snap!!.getValue(MessageModel::class.java)
+                Log.d("-------a",childAdded.toString()+" - "+data!!.message+" - "+(data!!.byId!=user!!.uid))
+                if(!childAdded){
+                    messageAdapterList.add(data!!)
+                }
+                else if(childAdded && data!!.byId!=user!!.uid){
+                    messageAdapterList.add(data)
+                }
+                 messages.adapter!!.notifyDataSetChanged()
+                 messages.scrollToPosition(messages.adapter!!.itemCount-1)
 
             }
             override fun onChildChanged(snap: DataSnapshot?, p1: String?) {}
@@ -78,6 +108,7 @@ class Messages : AppCompatActivity() {
         })
         messages.setHasFixedSize(true)
         messages.adapter = messageAdapter(messageAdapterList, withPhoto, this@Messages, messages)
+        messages.scrollToPosition(messages.adapter!!.itemCount-1)
 
         updateExit("enter")
         backToHome.setOnClickListener {
@@ -142,25 +173,65 @@ class Messages : AppCompatActivity() {
             }
         }
 
+
+        var BottomReached = false
+        var loading = false
+        var pastVisiblesItems:Int
+        var visibleItemCount:Int
+        var totalItemCount:Int
+        val mLayoutManager = LinearLayoutManager(this)
+        messages.layoutManager = mLayoutManager
+        messages.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView:RecyclerView, dx:Int, dy:Int) {
+                val scrollHeight = messages.computeVerticalScrollOffset()
+                if(dy<0 && scrollHeight==0 && !loading){
+                    loading = true
+                   // Log.d("------aaa","HOPPAAA YUKLEME BASLADI")
+                    loading = false
+                }
+                visibleItemCount = mLayoutManager.childCount
+                totalItemCount = mLayoutManager.itemCount
+                pastVisiblesItems = mLayoutManager.findFirstVisibleItemPosition()
+                BottomReached = (visibleItemCount + pastVisiblesItems) >= totalItemCount
+            }
+        })
+
+        sendBoxArea.addOnLayoutChangeListener(object:View.OnLayoutChangeListener{
+           override fun onLayoutChange(v: View, left: Int, top: Int, right: Int, bottom: Int, leftWas: Int, topWas: Int, rightWas: Int, bottomWas: Int) {
+                val heightWas = bottomWas - topWas
+                if (v.height != heightWas) {
+                    val params = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT,ConstraintLayout.LayoutParams.MATCH_PARENT)
+                    val mesHeight = sendBoxArea.height
+                    params.setMargins(0,dptopx(60),0,mesHeight)
+                    messages.layoutParams = params
+                    Log.d("-------a",BottomReached.toString())
+                    if(BottomReached)
+                        messages.scrollToPosition(messages.adapter!!.itemCount-1)
+                }
+            }
+
+        })
+
         sendMessage.setOnClickListener {
+            childAdded=true
             val message = messageBox.text.trim().toString()
-
-            messageAdapterList.add(MessageModel(user!!.uid,message,0,(System.currentTimeMillis()/1000).toInt(),withId,"null"))
-            if(initalLoad)
-                messages.adapter!!.notifyDataSetChanged()
-            messages.scrollToPosition(messages.adapter!!.itemCount-1)
-
-            val query = FirebaseDatabase.getInstance().getReference("messages/${chatId}").push()
-            val key = query.key
-            query.setValue(newMessage(user!!.uid,message, 0,System.currentTimeMillis()/1000,withId,key))
-            messageBox.text.clear()
-
+            if(((initialLoad && messageAdapterList.size>0) || (!initialLoad && messageAdapterList.size<=0)) && message.count()>0) {
+                val query = FirebaseDatabase.getInstance().getReference("messages/${chatId}").push()
+                val key = query.key
+                messageAdapterList.add(MessageModel(user!!.uid, message, 0, System.currentTimeMillis() / 1000, withId, key))
+                query.setValue(newMessage(user!!.uid, message, 0, System.currentTimeMillis() / 1000, withId, key))
+                messageBox.text.clear()
+                messages.scrollToPosition(messages.adapter!!.itemCount-1)
+            }
         }
+    }
+
+    fun dptopx(dp:Int):Int{
+        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp.toFloat(),resources.displayMetrics))
     }
 
     fun getDate(timestamp: Long): String {
         val date = Date(timestamp * 1000L)
-        // format of the date
         val jdf = SimpleDateFormat("dd.MM.yyyy")
         jdf.timeZone = TimeZone.getTimeZone("GMT-4")
         val java_date = jdf.format(date)

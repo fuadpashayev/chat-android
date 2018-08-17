@@ -17,6 +17,7 @@ import java.util.*
 
 
 class messageAdapter(var messagesList:ArrayList<MessageModel>,var withPhoto:String?,var messagesActivity:Activity,var messages:RecyclerView): RecyclerView.Adapter<MessageViewHolder>(){
+
     var auth = FirebaseAuth.getInstance()
     var user = auth.currentUser
     var usid:String?=null
@@ -30,10 +31,7 @@ class messageAdapter(var messagesList:ArrayList<MessageModel>,var withPhoto:Stri
         return position
      }
 
-
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
-        Log.d("-------aaa","create")
         data = messagesList.get(viewType)
         val layoutInflater = LayoutInflater.from(parent.context)
         val inflaterLayout = if(data!!.byId==user!!.uid) R.layout.message_my_layout else R.layout.message_layout
@@ -51,21 +49,18 @@ class messageAdapter(var messagesList:ArrayList<MessageModel>,var withPhoto:Stri
                 .centerCrop()
                 .crossFade(1000)
                 .into(imgHolder)
-        messages.scrollToPosition(messages.adapter!!.itemCount - 1)
-        if(viewType == messagesList.size-1){
-            val animation = AnimationUtils.loadAnimation(messagesActivity, R.anim.slide_top)
-            holder.view.messageBubble.startAnimation(animation)
-        }
 
         return holder
     }
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
-       // Log.d("-------aaa",messagesList.size.toString())
-       // Log.d("-------aaa1",messages.adapter!!.itemCount.toString())
-        holder.view.messageText.text = messagesList.get(position).message
-        holder.view.messageTime.text = date("HH:mm",messagesList.get(position).timestamp!!.toLong())
-
+        val dataa = messagesList.get(position)
+        holder.view.messageText.text = dataa.message
+        holder.view.messageTime.text = date("HH:mm",dataa.timestamp!!.toLong())
+        if(position == messagesList.size-1 && dataa.timestamp!!>=(System.currentTimeMillis()/1000)-2){
+            val animation = AnimationUtils.loadAnimation(messagesActivity, R.anim.abc_fade_in)
+            holder.view.messageBubble.startAnimation(animation)
+        }
     }
     fun date(pattern:String,timestamp: Long): String {
         val date = Date(timestamp * 1000L)
