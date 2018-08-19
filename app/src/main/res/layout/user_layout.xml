@@ -11,44 +11,40 @@
     android:clickable="true">
 
     <ImageView
-        android:id="@+id/chatPhoto"
+        android:id="@+id/userPhoto"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginStart="10dp"
-        android:background="@drawable/image_round"
-        android:adjustViewBounds="true"
         android:scaleType="centerInside"
+        android:adjustViewBounds="true"
         android:layout_weight="0"
+        android:background="@drawable/image_round"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/no_image"  />
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <TextView
-        android:id="@+id/chatBoxName"
+        android:id="@+id/userName"
         android:layout_width="wrap_content"
         android:layout_height="22dp"
-        android:layout_marginBottom="8dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:text="TextView"
         android:textColor="#000"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/chatBoxMessage"
-        app:layout_constraintStart_toEndOf="@+id/chatPhoto"
-        app:layout_constraintTop_toTopOf="@+id/chatPhoto" />
+        app:layout_constraintStart_toEndOf="@+id/userPhoto"
+        app:layout_constraintTop_toTopOf="@+id/userPhoto" />
 
 
     <TextView
-        android:id="@+id/chatBoxMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:layout_marginStart="10dp"
-        android:text="TextView"
-        android:textColor="#515151"
-        app:layout_constraintBottom_toBottomOf="@+id/chatPhoto"
-        app:layout_constraintStart_toEndOf="@+id/chatPhoto" />
+        android:text="Tap to start chat"
+        android:textColor="#8c8c8c"
+        app:layout_constraintBottom_toBottomOf="@+id/userPhoto"
+        app:layout_constraintStart_toEndOf="@+id/userPhoto" />
 
 </android.support.constraint.ConstraintLayout>

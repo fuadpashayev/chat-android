@@ -2,9 +2,15 @@ package com.app.chat
 
 
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
+import android.os.Handler
 import android.support.v4.app.Fragment
 import android.support.v7.widget.RecyclerView
+import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,9 +22,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.chatbox_layout.view.*
 import kotlinx.android.synthetic.main.fragment_chat.view.*
-
-
-
+import java.util.*
 
 
 class Chat : Fragment() {
@@ -31,7 +35,7 @@ class Chat : Fragment() {
 
         val query = FirebaseDatabase.getInstance().getReference("users/${user!!.uid}/chats")
 
-        val firebaseRecyclerAdapter = object : FirebaseRecyclerAdapter<ChatBoxModel, ChatBoxViewHolder>(
+        val firebaseAdapter = object : FirebaseRecyclerAdapter<ChatBoxModel, ChatBoxViewHolder>(
                 ChatBoxModel::class.java,
                 R.layout.chatbox_layout,
                 ChatBoxViewHolder::class.java,
@@ -42,8 +46,10 @@ class Chat : Fragment() {
             override fun populateViewHolder(viewHolder: ChatBoxViewHolder?, model: ChatBoxModel?, position: Int) {
                 rootView.loader.visibility = View.GONE
                 viewHolder!!.itemView.chatBoxMessage.text = model!!.lastMessage
+                if(model.lastMessage=="") viewHolder.itemView.chatBoxMessage.visibility = View.GONE
+                else viewHolder.itemView.chatBoxMessage.visibility = View.VISIBLE
                 val imgHolder = viewHolder.itemView.chatPhoto
-                imgHolder.setClipToOutline(true)
+                imgHolder.clipToOutline = true
 
                 Glide.with(context!!)
                         .load(model.photo)
@@ -67,24 +73,19 @@ class Chat : Fragment() {
 
         }
 
-        rootView.chatBoxes.adapter = firebaseRecyclerAdapter
-
-
-
+        rootView.chatBoxes.adapter = firebaseAdapter
 
 
         return rootView
     }
 
-
-
-
-
-
-
-    class ChatBoxViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView!!) {
-
+    fun dptopx(dp:Int):Int{
+        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp.toFloat(),resources.displayMetrics))
     }
+
+
+
+    class ChatBoxViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView!!)
 
 
 }

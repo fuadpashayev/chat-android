@@ -1,16 +1,14 @@
 package com.app.chat
 
 
-import android.app.Activity
+
 import android.content.Context
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import kotlinx.android.synthetic.main.activity_main.*
 import android.content.Intent
-
 import android.os.Handler
-import android.text.InputType
-import android.util.Log
+import android.util.TypedValue
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.google.firebase.auth.FirebaseAuth
@@ -89,7 +87,7 @@ class MainActivity : AppCompatActivity() {
                     loader()
                     auth!!.signInWithEmailAndPassword(login, pass).addOnCompleteListener(this, OnCompleteListener<AuthResult> { task ->
                         if (task.isSuccessful) {
-                            user = auth!!.getCurrentUser()
+                            user = auth!!.currentUser
                             Toast.makeText(this, "You Signed In.", Toast.LENGTH_SHORT).show()
                             startHome()
                             login_email.text.clear()
@@ -117,9 +115,9 @@ class MainActivity : AppCompatActivity() {
                     auth!!.createUserWithEmailAndPassword(login, pass)
                             .addOnCompleteListener(this, OnCompleteListener<AuthResult> { task ->
                                 if (task.isSuccessful) {
-                                    user = auth!!.getCurrentUser()
+                                    user = auth!!.currentUser
                                     val usersRef = FirebaseDatabase.getInstance().getReference("users/${user!!.uid}")
-                                    val newUser = Users(login,gender,user!!.uid,name)
+                                    val newUser = UsersModel(login,gender,user!!.uid,name)
                                     usersRef.setValue(newUser)
                                     startHome()
                                     Toast.makeText(this, "You Successfully Registered.", Toast.LENGTH_SHORT).show()
@@ -142,7 +140,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun startHome(){
+    private fun startHome(){
         val intent = Intent(this,Home::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)

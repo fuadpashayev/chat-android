@@ -9,11 +9,11 @@
     tools:context=".Messages">
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/constraintLayout"
+        android:id="@+id/messageStatusBar"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:elevation="3dp"
         android:background="@color/colorPrimaryDark"
+        android:elevation="3dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -38,7 +38,11 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginEnd="15dp"
+            android:adjustViewBounds="true"
             android:background="@drawable/image_round"
+            android:backgroundTint="#ffffff"
+            android:foreground="@drawable/message_image_round_and_selector"
+            android:scaleType="centerInside"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -48,9 +52,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
+            android:background="@drawable/message_image_round_and_selector"
             android:clickable="true"
             android:focusable="true"
-            android:background="@drawable/message_image_round_and_selector"
             android:padding="10dp"
             android:tint="#ffffff"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -70,7 +74,60 @@
             app:layout_constraintBottom_toBottomOf="@+id/backToHome"
             app:layout_constraintStart_toEndOf="@+id/backToHome" />
 
+    </android.support.constraint.ConstraintLayout>
 
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/messageActions"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/colorPrimaryDark"
+        android:elevation="3dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <ImageView
+            android:id="@+id/copyMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:padding="10dp"
+            android:tint="#fff"
+            android:background="@drawable/message_image_round_and_selector"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/deleteMessage"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_copy" />
+
+        <ImageView
+            android:id="@+id/deleteMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:tint="#fff"
+            android:padding="10dp"
+            android:background="@drawable/message_image_round_and_selector"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_delete" />
+
+        <ImageView
+            android:id="@+id/closeMessageActions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:padding="10dp"
+            android:tint="#fff"
+            android:background="@drawable/message_image_round_and_selector"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_close" />
     </android.support.constraint.ConstraintLayout>
 
     <android.support.v7.widget.RecyclerView
@@ -84,7 +141,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/messageStatusBar" />
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/sendBoxArea"

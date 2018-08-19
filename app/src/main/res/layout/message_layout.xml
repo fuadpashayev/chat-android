@@ -10,6 +10,7 @@
 
 
     <FrameLayout
+        android:id="@+id/messageFor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -69,8 +70,9 @@
         android:layout_height="35dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="2dp"
-        android:background="@drawable/image_round"
+        android:elevation="1dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/image_round" />
 
 </android.support.constraint.ConstraintLayout>

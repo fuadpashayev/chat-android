@@ -5,4 +5,6 @@
     <color name="colorAccent">#FF4081</color>
     <color name="tabActive">#ececec</color>
     <color name="tabPassive">#00ffffff</color>
+    <color name="messageSeleted">#2f3f51b5</color>
+    <color name="transparent">#00000000</color>
 </resources>
