@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -76,7 +76,6 @@
 
     </android.support.constraint.ConstraintLayout>
 
-
     <android.support.constraint.ConstraintLayout
         android:id="@+id/messageActions"
         android:layout_width="match_parent"
@@ -95,9 +94,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
+            android:background="@drawable/message_image_round_and_selector"
             android:padding="10dp"
             android:tint="#fff"
-            android:background="@drawable/message_image_round_and_selector"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/deleteMessage"
             app:layout_constraintTop_toTopOf="parent"
@@ -108,9 +107,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:tint="#fff"
-            android:padding="10dp"
             android:background="@drawable/message_image_round_and_selector"
+            android:padding="10dp"
+            android:tint="#fff"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -121,20 +120,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
+            android:background="@drawable/message_image_round_and_selector"
             android:padding="10dp"
             android:tint="#fff"
-            android:background="@drawable/message_image_round_and_selector"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_close" />
     </android.support.constraint.ConstraintLayout>
 
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/messages"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="51dp"
+        android:layout_above="@+id/sendBoxArea"
+        android:layout_marginBottom="0dp"
         android:layout_marginTop="60dp"
         app:layoutManager="android.support.v7.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@+id/sendBoxArea"
@@ -147,9 +148,11 @@
         android:id="@+id/sendBoxArea"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+
+        android:layout_alignParentStart="true"
         android:clipToPadding="false"
         android:paddingBottom="5dp"
-
         android:paddingEnd="5dp"
         android:paddingStart="5dp"
         android:paddingTop="5dp"
@@ -217,4 +220,4 @@
     </android.support.constraint.ConstraintLayout>
 
 
-</android.support.constraint.ConstraintLayout>
+</RelativeLayout>

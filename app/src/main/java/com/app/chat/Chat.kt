@@ -14,13 +14,19 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.firebase.ui.database.FirebaseRecyclerAdapter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.chatbox_layout.view.*
+import kotlinx.android.synthetic.main.fragment_chat.*
 import kotlinx.android.synthetic.main.fragment_chat.view.*
 import java.util.*
 
@@ -35,6 +41,23 @@ class Chat : Fragment() {
 
         val query = FirebaseDatabase.getInstance().getReference("users/${user!!.uid}/chats")
 
+
+        query.limitToLast(1).addListenerForSingleValueEvent(object:ValueEventListener{
+            override fun onCancelled(p0: DatabaseError?) {}
+
+            override fun onDataChange(snap: DataSnapshot?) {
+               if(!snap!!.exists()){
+                   rootView.loader.visibility = View.GONE
+                   rootView.startNewChat.visibility = View.VISIBLE
+               }else rootView.startNewChat.visibility = View.GONE
+            }
+
+        })
+
+        rootView.startNewChat.setOnClickListener {
+            activity!!.viewPager.setCurrentItem(1,true)
+        }
+
         val firebaseAdapter = object : FirebaseRecyclerAdapter<ChatBoxModel, ChatBoxViewHolder>(
                 ChatBoxModel::class.java,
                 R.layout.chatbox_layout,
@@ -45,6 +68,7 @@ class Chat : Fragment() {
 
             override fun populateViewHolder(viewHolder: ChatBoxViewHolder?, model: ChatBoxModel?, position: Int) {
                 rootView.loader.visibility = View.GONE
+                rootView.startNewChat.visibility = View.GONE
                 viewHolder!!.itemView.chatBoxMessage.text = model!!.lastMessage
                 if(model.lastMessage=="") viewHolder.itemView.chatBoxMessage.visibility = View.GONE
                 else viewHolder.itemView.chatBoxMessage.visibility = View.VISIBLE

@@ -11,19 +11,19 @@
         android:id="@+id/chatBoxes"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:scrollbars="vertical"
+        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:reverseLayout="true"
-        app:stackFromEnd="true"
-        android:scrollbars="vertical"
-        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:stackFromEnd="true" />
 
     <android.support.constraint.ConstraintLayout
-        android:layout_width="match_parent"
         android:id="@+id/loader"
+        android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <ProgressBar
@@ -38,4 +38,46 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
     </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/startNewChat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:background="#ffffff"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/loader"
+        app:layout_constraintVertical_bias="0.45">
+
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Start New Chat"
+            android:textColor="@color/text_button_hover"
+            android:textSize="15sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView5" />
+
+        <ImageView
+            android:id="@+id/imageView5"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_message"
+            android:tint="@color/text_button_hover"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </android.support.constraint.ConstraintLayout>
+
 </android.support.constraint.ConstraintLayout>

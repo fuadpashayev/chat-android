@@ -22,6 +22,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_message.*
 import kotlinx.android.synthetic.main.message_layout.*
+import kotlinx.coroutines.experimental.launch
 import java.util.*
 import java.text.SimpleDateFormat
 import kotlin.collections.HashMap
@@ -60,6 +61,7 @@ class Messages : AppCompatActivity() {
                 .crossFade(1000)
                 .into(messagePhoto)
         val query = FirebaseDatabase.getInstance().getReference("messages/$chatId")
+
         messageBox.requestFocus()
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
@@ -84,6 +86,7 @@ class Messages : AppCompatActivity() {
                 initialLoad = true
                 loader.visibility = View.GONE
                 val data = snap!!.getValue(MessageModel::class.java)
+
                 if(!childAdded){
                     messageAdapterList.add(data!!)
                 }
@@ -92,7 +95,6 @@ class Messages : AppCompatActivity() {
                 }
                  messages.adapter!!.notifyDataSetChanged()
                  messages.scrollToPosition(messages.adapter!!.itemCount-1)
-            Log.d("-------a",snap.toString())
             }
             override fun onChildChanged(snap: DataSnapshot?, p1: String?) {}
             override fun onChildRemoved(snap: DataSnapshot?) {
@@ -211,48 +213,38 @@ class Messages : AppCompatActivity() {
             }
         })
 
-        sendBoxArea.addOnLayoutChangeListener { v, _, _, _, _, _, topWas, _, bottomWas ->
-            val heightWas = bottomWas - topWas
-            if (v.height != heightWas) {
-                val params = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT,ConstraintLayout.LayoutParams.MATCH_PARENT)
-                val mesHeight = sendBoxArea.height
-                params.setMargins(0,dptopx(60),0,mesHeight)
-                messages.layoutParams = params
-                if(BottomReached)
-                    messages.scrollToPosition(messages.adapter!!.itemCount-1)
-            }
-        }
+//        sendBoxArea.addOnLayoutChangeListener { v, _, _, _, _, _, topWas, _, bottomWas ->
+//            val heightWas = bottomWas - topWas
+//            if (v.height != heightWas) {
+//                val params = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT,ConstraintLayout.LayoutParams.MATCH_PARENT)
+//                val mesHeight = sendBoxArea.height
+//                params.setMargins(0,dptopx(60),0,mesHeight)
+//                messages.layoutParams = params
+//                if(BottomReached)
+//                    messages.scrollToPosition(messages.adapter!!.itemCount-1)
+//            }
+//        }
 
         sendMessage.setOnClickListener {
             childAdded=true
             val message = messageBox.text.trim().toString()
             if(((initialLoad && messageAdapterList.size>0) || (!initialLoad && messageAdapterList.size<=0)) && message.count()>0) {
                 var myUser:UsersModel?=null
-                var keyChat:String?=null
+                var keyChat:String?=chatId
                 val timestamp = System.currentTimeMillis() / 1000
-                var ChatId:String?
                 FirebaseDatabase.getInstance().getReference("users/${user!!.uid}").addListenerForSingleValueEvent(object:ValueEventListener{
                     override fun onCancelled(p0: DatabaseError?) {}
                     override fun onDataChange(snap: DataSnapshot?) {
-                        if(!snap!!.child("chats/$chatId").exists()){
-                            myUser = snap.getValue(UsersModel::class.java)
-                            val query = FirebaseDatabase.getInstance().getReference("users/${myUser!!.Id}/chats").push()
-                            keyChat = query.key
-                            ChatId=keyChat
-                            chatId=keyChat
-                            query.setValue(ChatBoxModel(message,timestamp.toInt(),withId,withName,withPhoto,keyChat))
-                        }else {
+                        myUser = snap!!.getValue(UsersModel::class.java)
+                        val uquery = FirebaseDatabase.getInstance().getReference("users/${user!!.uid}/chats/$chatId")
+                        val data = HashMap<String, Any>()
+                        data["lastMessage"] = message
+                        data["timestamp"] = timestamp
+                        data["from"] = user!!.uid
+                        uquery.updateChildren(data)
 
-                            val query = FirebaseDatabase.getInstance().getReference("users/${user!!.uid}/chats/$chatId")
-                            val data = HashMap<String, Any>()
-                            data["lastMessage"] = message
-                            data["timestamp"] = timestamp
-                            data["from"] = user!!.uid
-                            query.updateChildren(data)
-                            ChatId=chatId
-                        }
 
-                        val query = FirebaseDatabase.getInstance().getReference("messages/$ChatId").push()
+                        val query = FirebaseDatabase.getInstance().getReference("messages/$chatId").push()
                         val key = query.key
                         messageAdapterList.add(MessageModel(user!!.uid, message, 0, timestamp, withId, key))
                         query.setValue(newMessage(user!!.uid, message, 0, timestamp, withId, key))
@@ -266,8 +258,8 @@ class Messages : AppCompatActivity() {
                     override fun onCancelled(p0: DatabaseError?) {}
                     override fun onDataChange(snap: DataSnapshot?) {
                         if(!snap!!.child("chats/$chatId").exists()){
-                            val query = FirebaseDatabase.getInstance().getReference("users/$withId/chats/$keyChat")
-                            query.setValue(ChatBoxModel(message,timestamp.toInt(),myUser!!.Id,myUser!!.Name,myUser!!.Photo,keyChat))
+                            val query = FirebaseDatabase.getInstance().getReference("users/$withId/chats/$chatId")
+                            query.setValue(ChatBoxModel(message,timestamp,myUser!!.Id,myUser!!.Name,myUser!!.Photo,keyChat,user!!.uid))
                         }else {
                             val query = FirebaseDatabase.getInstance().getReference("users/$withId/chats/$chatId")
                             val data = HashMap<String, Any>()
@@ -295,9 +287,9 @@ class Messages : AppCompatActivity() {
     }
 
     fun getDate(timestamp: Long): String {
-        val date = Date(timestamp * 1000L)
-        val jdf = SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH)
-        jdf.timeZone = TimeZone.getTimeZone("GMT-4")
+        val date = Date(timestamp * 1000)
+        val jdf = SimpleDateFormat("dd.MM.yyyy")
+        jdf.timeZone = TimeZone.getTimeZone("GMT+4")
         return jdf.format(date)
     }
 

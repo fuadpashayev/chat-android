@@ -25,7 +25,6 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import kotlinx.android.synthetic.main.fragment_chat.view.*
 import kotlinx.android.synthetic.main.fragment_contacts.view.*
 import kotlinx.android.synthetic.main.user_layout.view.*
 
@@ -39,6 +38,20 @@ class Contacts : Fragment() {
         user = auth!!.currentUser
 
         val query = FirebaseDatabase.getInstance().getReference("users")
+
+
+        query.limitToLast(2).addListenerForSingleValueEvent(object:ValueEventListener{
+            override fun onCancelled(p0: DatabaseError?) {}
+
+            override fun onDataChange(snap: DataSnapshot?) {
+                if(!snap!!.exists() || snap.childrenCount==1L){
+                    rootView.loader.visibility = View.GONE
+                    rootView.noContacts.visibility = View.VISIBLE
+                }else rootView.noContacts.visibility = View.GONE
+            }
+
+        })
+
         val contactsAdapter = object : FirebaseRecyclerAdapter<UsersModel, UsersViewHolder>(
                 UsersModel::class.java,
                 R.layout.user_layout,
@@ -48,7 +61,9 @@ class Contacts : Fragment() {
         ){
 
             override fun populateViewHolder(viewHolder: UsersViewHolder?, model: UsersModel?, position: Int) {
+                rootView.loader.visibility = View.GONE
                 if(model!!.Id!=user!!.uid) {
+
                     viewHolder!!.itemView.userName.text = model.Name
                     val imgHolder = viewHolder.itemView.userPhoto
                     imgHolder.clipToOutline = true
@@ -68,20 +83,26 @@ class Contacts : Fragment() {
                         intent.putExtra("withName",model.Name)
                         intent.putExtra("withPhoto",model.Photo)
                         var chatId = "0"
+                        rootView.loader.visibility = View.VISIBLE
                         FirebaseDatabase.getInstance().getReference("users/${user!!.uid}/chats").orderByChild("withId").equalTo(model.Id).addListenerForSingleValueEvent(object:ValueEventListener{
                             override fun onCancelled(p0: DatabaseError?) {}
                             override fun onDataChange(snap: DataSnapshot?) {
                                 if(snap!!.exists()){
                                     for(snappo in snap.children){
                                         chatId = snappo.child("id").getValue(String::class.java)!!
-
                                     }
-
-
+                                }else{
+                                    val query = FirebaseDatabase.getInstance().getReference("users/${user!!.uid}/chats").push()
+                                    chatId=query.key
+                                    val timestamp = System.currentTimeMillis()/100
+                                    query.setValue(ChatBoxModel("",timestamp,model.Id,model.Name,model.Photo,chatId,user!!.uid))
                                 }
+                                rootView.loader.visibility = View.GONE
                                 intent.putExtra("chatId",chatId)
                                 startActivity(intent)
                             }
+
+
 
                         })
 

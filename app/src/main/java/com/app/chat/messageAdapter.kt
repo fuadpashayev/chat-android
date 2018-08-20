@@ -46,7 +46,6 @@ class messageAdapter(var messagesList:ArrayList<MessageModel>,var withPhoto:Stri
      override fun getItemViewType(position: Int): Int {
         return position
      }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
         data = messagesList[viewType]
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -65,6 +64,7 @@ class messageAdapter(var messagesList:ArrayList<MessageModel>,var withPhoto:Stri
                 .into(imgHolder)
         return holder
     }
+
     var beforeView:View?=null
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
         val dataa = messagesList[position]
@@ -75,65 +75,75 @@ class messageAdapter(var messagesList:ArrayList<MessageModel>,var withPhoto:Stri
             holder.view.messageBubble.startAnimation(animation)
         }
 
+        holder.view.setOnLongClickListener {
+            onLongClick(holder,position)
+            true
+        }
 
         holder.view.messageFor.setOnLongClickListener {
-            if(beforeView!=null){
-                beforeView!!.setBackgroundColor(messagesActivity.resources.getColor(R.color.transparent))
-            }
-            beforeView = holder.view
-            messagesActivity.messageStatusBar.visibility = View.GONE
-            messagesActivity.messageActions.visibility = View.VISIBLE
-            holder.view.setBackgroundColor(messagesActivity.resources.getColor(R.color.messageSeleted))
-            messagesActivity.closeMessageActions.setOnClickListener {
-                messagesActivity.messageActions.visibility = View.GONE
-                messagesActivity.messageStatusBar.visibility = View.VISIBLE
-                holder.view.setBackgroundColor(messagesActivity.resources.getColor(R.color.transparent))
-            }
-            messagesActivity.copyMessage.setOnClickListener {
-                val clipboard = messagesActivity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
-                val clip = ClipData.newPlainText("Copied Message", messagesList[position].message)
-                clipboard!!.primaryClip = clip
-                Toast.makeText(messagesActivity,"Message copied",Toast.LENGTH_SHORT).show()
-            }
-            messagesActivity.deleteMessage.setOnClickListener {
-                val dialog = AlertDialog.Builder(messagesActivity,R.style.DialogTheme)
-                dialog.setMessage("Are you sure to delete this message?")
-                dialog.setCancelable(true)
-                dialog.setNegativeButton("Cancel"){_,_->}
-                dialog.setPositiveButton("Yes") { _, _ ->
-                    FirebaseDatabase.getInstance().getReference("messages/$chatId/${messagesList[position].id}").removeValue()
-                    Toast.makeText(messagesActivity,"Message deleted",Toast.LENGTH_SHORT).show()
-                    if(position == messagesList.size-1) {
-                        val nlm = messagesList[if(position==0) 0 else position - 1]
-                        val newData = HashMap<String?, Any?>()
-                        newData["lastMessage"] = nlm.message
-                        newData["timestamp"] = nlm.timestamp
-                        if(position==0 && messagesList.size==1){
-                            newData["lastMessage"] = ""
-                        }
-                        newData["from"] = if (nlm.byId == user!!.uid) nlm.byId else nlm.toId
-                        FirebaseDatabase.getInstance().getReference("users/${nlm.byId}/chats/$chatId").updateChildren(newData)
-                        FirebaseDatabase.getInstance().getReference("users/${nlm.toId}/chats/$chatId").updateChildren(newData)
-                    }
-                    messagesList.removeAt(position)
-                    notifyItemRemoved(position)
-                    if(beforeView!=null){
-                        messagesActivity.closeMessageActions.callOnClick()
-                    }
-
-                }
-                dialog.create().show()
-            }
-
+            onLongClick(holder,position)
             true
         }
 
 
     }
+
+    fun onLongClick(holder:MessageViewHolder,position: Int){
+        if(beforeView!=null){
+            beforeView!!.setBackgroundColor(messagesActivity.resources.getColor(R.color.transparent))
+            beforeView=null
+        }
+        beforeView = holder.view
+        messagesActivity.messageStatusBar.visibility = View.GONE
+        messagesActivity.messageActions.visibility = View.VISIBLE
+        holder.view.setBackgroundColor(messagesActivity.resources.getColor(R.color.messageSeleted))
+        messagesActivity.closeMessageActions.setOnClickListener {
+            messagesActivity.messageActions.visibility = View.GONE
+            messagesActivity.messageStatusBar.visibility = View.VISIBLE
+            holder.view.setBackgroundColor(messagesActivity.resources.getColor(R.color.transparent))
+        }
+        messagesActivity.copyMessage.setOnClickListener {
+            val clipboard = messagesActivity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
+            val clip = ClipData.newPlainText("Copied Message", messagesList[position].message)
+            clipboard!!.primaryClip = clip
+            Toast.makeText(messagesActivity,"Message copied",Toast.LENGTH_SHORT).show()
+        }
+        messagesActivity.deleteMessage.setOnClickListener {
+            val dialog = AlertDialog.Builder(messagesActivity,R.style.DialogTheme)
+            dialog.setMessage("Are you sure to delete this message?")
+            dialog.setCancelable(true)
+            dialog.setNegativeButton("Cancel"){_,_->}
+            dialog.setPositiveButton("Yes") { _, _ ->
+                FirebaseDatabase.getInstance().getReference("messages/$chatId/${messagesList[position].id}").removeValue()
+                Toast.makeText(messagesActivity,"Message deleted",Toast.LENGTH_SHORT).show()
+                if(position == messagesList.size-1) {
+                    val nlm = messagesList[if(position==0) 0 else position - 1]
+                    val newData = HashMap<String?, Any?>()
+                    newData["lastMessage"] = nlm.message
+                    newData["timestamp"] = nlm.timestamp
+                    if(position==0 && messagesList.size==1){
+                        newData["lastMessage"] = ""
+                    }
+                    newData["from"] = if (nlm.byId == user!!.uid) nlm.byId else nlm.toId
+                    FirebaseDatabase.getInstance().getReference("users/${nlm.byId}/chats/$chatId").updateChildren(newData)
+                    FirebaseDatabase.getInstance().getReference("users/${nlm.toId}/chats/$chatId").updateChildren(newData)
+                }
+                messagesList.removeAt(position)
+                notifyItemRemoved(position)
+                if(beforeView!=null){
+                    messagesActivity.closeMessageActions.callOnClick()
+                    beforeView=null
+                }
+
+            }
+            dialog.create().show()
+        }
+    }
+
     fun date(pattern:String,timestamp: Long): String {
         val date = Date(timestamp * 1000L)
-        val jdf = SimpleDateFormat(pattern, Locale.ENGLISH)
-        jdf.timeZone = TimeZone.getTimeZone("GMT-4")
+        val jdf = SimpleDateFormat(pattern)
+        jdf.timeZone = TimeZone.getTimeZone("GMT+4")
         return jdf.format(date)
     }
     fun dptopx(dp:Int):Int{

@@ -9,7 +9,7 @@ class UsersModel {
     var Exit:Int?=null
 
     constructor(){}
-    constructor(Email:String?,Gender:String?,Id:String?,Name:String?,Photo:String?="",Exit:Int?=0){
+    constructor(Email:String?,Gender:String?,Id:String?,Name:String?,Photo:String?="https://alsosto.org/wp-content/uploads/2017/08/noavatar.png",Exit:Int?=0){
         this.Email = Email
         this.Gender = Gender
         this.Id = Id

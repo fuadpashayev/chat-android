@@ -25,7 +25,6 @@ class Home : AppCompatActivity() {
         viewPager.adapter = adapter
         val tabLayout = sliding_tabs as TabLayout
         tabLayout.setupWithViewPager(viewPager)
-
         auth = FirebaseAuth.getInstance()
         user = auth!!.currentUser
 
