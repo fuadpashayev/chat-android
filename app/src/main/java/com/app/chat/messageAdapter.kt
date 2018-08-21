@@ -29,6 +29,7 @@ import android.content.Context
 import android.content.Context.CLIPBOARD_SERVICE
 import android.support.v4.content.ContextCompat.getSystemService
 import android.support.v7.widget.LinearLayoutManager
+import android.view.MotionEvent
 import android.widget.LinearLayout
 
 
@@ -84,6 +85,27 @@ class messageAdapter(var messagesList:ArrayList<MessageModel>,var withPhoto:Stri
             onLongClick(holder,position)
             true
         }
+
+var a=false
+        holder.view.setOnTouchListener(object:View.OnTouchListener{
+            override fun onTouch(eventView: View?, event: MotionEvent?): Boolean {
+
+                val duration = event!!.eventTime-event.downTime
+//                Log.d("--------a",event.toString())
+                if(event.action==MotionEvent.ACTION_DOWN)
+                    holder.view.setBackgroundColor(messagesActivity.resources.getColor(R.color.messageSeleted))
+                else if((event.action==MotionEvent.ACTION_CANCEL || event.action==MotionEvent.ACTION_UP) && beforeView==null && a)
+                    holder.view.setBackgroundColor(messagesActivity.resources.getColor(R.color.transparent))
+
+                if(duration<200 && event.pointerCount==1 && event.action==1 && beforeView!=null)
+                    messagesActivity.closeMessageActions.callOnClick()
+
+                Log.d("-------a",(beforeView==null).toString())
+                a=true
+                return false
+            }
+
+        })
 
 
     }
