@@ -86,33 +86,43 @@ class messageAdapter(var messagesList:ArrayList<MessageModel>,var withPhoto:Stri
             true
         }
 
-var a=false
-        holder.view.setOnTouchListener(object:View.OnTouchListener{
-            override fun onTouch(eventView: View?, event: MotionEvent?): Boolean {
 
-                val duration = event!!.eventTime-event.downTime
-//                Log.d("--------a",event.toString())
-                if(event.action==MotionEvent.ACTION_DOWN)
-                    holder.view.setBackgroundColor(messagesActivity.resources.getColor(R.color.messageSeleted))
-                else if((event.action==MotionEvent.ACTION_CANCEL || event.action==MotionEvent.ACTION_UP) && beforeView==null && a)
-                    holder.view.setBackgroundColor(messagesActivity.resources.getColor(R.color.transparent))
+//        holder.view.setOnTouchListener(object:View.OnTouchListener{
+//            override fun onTouch(eventView: View?, event: MotionEvent?): Boolean {
+//
+//                val duration = event!!.eventTime-event.downTime
+////                Log.d("--------a",event.toString())
+//                if(event.action==MotionEvent.ACTION_DOWN)
+//                    holder.view.setBackgroundColor(messagesActivity.resources.getColor(R.color.messageSeleted))
+//                else if((event.action==MotionEvent.ACTION_CANCEL || event.action==MotionEvent.ACTION_UP) ) {
+//                    holder.view.setBackgroundColor(messagesActivity.resources.getColor(R.color.transparent))
+//
+//                }
+//                if(duration<200 && event.pointerCount==1 && event.action==1 && beforeView!=null)
+//                    messagesActivity.closeMessageActions.callOnClick()
+//
+//                Log.d("-------a",(beforeView==null).toString())
+//
+//                return false
+//            }
+//
+//        })
 
-                if(duration<200 && event.pointerCount==1 && event.action==1 && beforeView!=null)
-                    messagesActivity.closeMessageActions.callOnClick()
+        holder.view.messageFor.setOnClickListener {
+            holder.view.callOnClick()
+        }
 
-                Log.d("-------a",(beforeView==null).toString())
-                a=true
-                return false
-            }
-
-        })
+        holder.view.setOnClickListener {
+            if(beforeView==it)
+                messagesActivity.closeMessageActions.callOnClick()
+        }
 
 
     }
 
     fun onLongClick(holder:MessageViewHolder,position: Int){
         if(beforeView!=null){
-            beforeView!!.setBackgroundColor(messagesActivity.resources.getColor(R.color.transparent))
+            beforeView!!.setBackgroundResource(R.drawable.message_all_selector)
             beforeView=null
         }
         beforeView = holder.view
@@ -122,7 +132,7 @@ var a=false
         messagesActivity.closeMessageActions.setOnClickListener {
             messagesActivity.messageActions.visibility = View.GONE
             messagesActivity.messageStatusBar.visibility = View.VISIBLE
-            holder.view.setBackgroundColor(messagesActivity.resources.getColor(R.color.transparent))
+            holder.view.setBackgroundResource(R.drawable.message_all_selector)
         }
         messagesActivity.copyMessage.setOnClickListener {
             val clipboard = messagesActivity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?

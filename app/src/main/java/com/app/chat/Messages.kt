@@ -26,6 +26,11 @@ import kotlinx.coroutines.experimental.launch
 import java.util.*
 import java.text.SimpleDateFormat
 import kotlin.collections.HashMap
+import android.app.Activity
+import android.support.v4.content.ContextCompat.getSystemService
+import android.text.Html
+import android.view.WindowManager
+import android.widget.Toast
 
 
 class Messages : AppCompatActivity() {
@@ -33,6 +38,8 @@ class Messages : AppCompatActivity() {
     var withName:String?=null
     var withPhoto:String?=null
     var chatId:String?=null
+    var status:Boolean=true
+    var withGender:String?=null
     var auth:FirebaseAuth?=null
     var user:FirebaseUser?=null
     var messageAdapterList = ArrayList<MessageModel>()
@@ -50,6 +57,52 @@ class Messages : AppCompatActivity() {
         withName = data.getString("withName")
         withPhoto = data.getString("withPhoto")
         chatId = data.getString("chatId")
+        withGender = data.getString("gender")
+
+        FirebaseDatabase.getInstance().getReference("users/${user!!.uid}/chats/$chatId").addValueEventListener(object:ValueEventListener{
+            override fun onCancelled(p0: DatabaseError?) {}
+            override fun onDataChange(snap: DataSnapshot?) {
+                val data = snap!!.getValue(ChatBoxModel::class.java)!!
+                val status = data.status!!
+                if(data.from==user!!.uid && !status){
+                    hideKeyboard(this@Messages)
+                    sendBoxArea.visibility = View.GONE
+                    requestMyText.text = Html.fromHtml("<font color='#000000'><b>$withName</b></font> has not accepted your request yet.")
+                    requestMyBody.visibility = View.VISIBLE
+                }else if(data.from!=user!!.uid && !status){
+                    sendBoxArea.visibility = View.GONE
+                    requestText.text = Html.fromHtml("<font color='#000000'><b>$withName</b></font> wants to send you message.")
+                    requestBody.visibility = View.VISIBLE
+                }else if(status){
+                    requestBody.visibility = View.GONE
+                    messageBox.requestFocus()
+                    window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
+                }
+            }
+
+        })
+
+
+        requestAccept.setOnClickListener {
+            val statusData = HashMap<String,Any>()
+            statusData["status"]=true
+            FirebaseDatabase.getInstance().getReference("users/${user!!.uid}/chats/$chatId").updateChildren(statusData)
+            FirebaseDatabase.getInstance().getReference("users/$withId/chats/$chatId").updateChildren(statusData)
+            requestBody.visibility = View.GONE
+            sendBoxArea.visibility = View.VISIBLE
+            messageBox.requestFocus()
+            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
+            Toast.makeText(this,Html.fromHtml("You accepted <font color='#000000'><b>$withName's</b></font> request"),Toast.LENGTH_SHORT).show()
+        }
+
+        requestDecline.setOnClickListener {
+            finish()
+            FirebaseDatabase.getInstance().getReference("users/${user!!.uid}/chats/$chatId").removeValue()
+            FirebaseDatabase.getInstance().getReference("users/$withId/chats/$chatId").removeValue()
+            FirebaseDatabase.getInstance().getReference("messages/$chatId").removeValue()
+            Toast.makeText(this,Html.fromHtml("You declined <font color='#000000'><b>$withName's</b></font> request"),Toast.LENGTH_SHORT).show()
+        }
+
         messagePhoto.clipToOutline = true
         messageName.text = withName
         Glide.with(this)
@@ -62,9 +115,7 @@ class Messages : AppCompatActivity() {
                 .into(messagePhoto)
         val query = FirebaseDatabase.getInstance().getReference("messages/$chatId")
 
-        messageBox.requestFocus()
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+
 
         query.limitToLast(1).addValueEventListener(object:ValueEventListener{
             override fun onCancelled(p0: DatabaseError?) {}
@@ -179,7 +230,7 @@ class Messages : AppCompatActivity() {
             var timestamp:Long?=null
             var toId:String?=null
             var id:String?=null
-            constructor(){}
+            constructor()
             constructor(byId:String?,message:String?,seen:Int?,timestamp:Long?,toId:String?,id:String?){
                 this.byId = byId
                 this.message = message
@@ -213,24 +264,21 @@ class Messages : AppCompatActivity() {
             }
         })
 
-//        sendBoxArea.addOnLayoutChangeListener { v, _, _, _, _, _, topWas, _, bottomWas ->
-//            val heightWas = bottomWas - topWas
-//            if (v.height != heightWas) {
-//                val params = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT,ConstraintLayout.LayoutParams.MATCH_PARENT)
-//                val mesHeight = sendBoxArea.height
-//                params.setMargins(0,dptopx(60),0,mesHeight)
-//                messages.layoutParams = params
-//                if(BottomReached)
-//                    messages.scrollToPosition(messages.adapter!!.itemCount-1)
-//            }
-//        }
+        sendBoxArea.addOnLayoutChangeListener { v, _, _, _, _, _, topWas, _, bottomWas ->
+            val heightWas = bottomWas - topWas
+            if (v.height != heightWas && BottomReached)
+                messages.scrollToPosition(messages.adapter!!.itemCount-1)
+        }
+
+
+
 
         sendMessage.setOnClickListener {
             childAdded=true
             val message = messageBox.text.trim().toString()
             if(((initialLoad && messageAdapterList.size>0) || (!initialLoad && messageAdapterList.size<=0)) && message.count()>0) {
                 var myUser:UsersModel?=null
-                var keyChat:String?=chatId
+                val keyChat:String?=chatId
                 val timestamp = System.currentTimeMillis() / 1000
                 FirebaseDatabase.getInstance().getReference("users/${user!!.uid}").addListenerForSingleValueEvent(object:ValueEventListener{
                     override fun onCancelled(p0: DatabaseError?) {}
@@ -241,6 +289,7 @@ class Messages : AppCompatActivity() {
                         data["lastMessage"] = message
                         data["timestamp"] = timestamp
                         data["from"] = user!!.uid
+                        data["status"] = myUser!!.Gender==withGender
                         uquery.updateChildren(data)
 
 
@@ -259,13 +308,15 @@ class Messages : AppCompatActivity() {
                     override fun onDataChange(snap: DataSnapshot?) {
                         if(!snap!!.child("chats/$chatId").exists()){
                             val query = FirebaseDatabase.getInstance().getReference("users/$withId/chats/$chatId")
-                            query.setValue(ChatBoxModel(message,timestamp,myUser!!.Id,myUser!!.Name,myUser!!.Photo,keyChat,user!!.uid))
+                            val status = withGender==myUser!!.Gender
+                            query.setValue(ChatBoxModel(message,timestamp,myUser!!.Id,myUser!!.Name,myUser!!.Photo,keyChat,user!!.uid,status))
                         }else {
                             val query = FirebaseDatabase.getInstance().getReference("users/$withId/chats/$chatId")
                             val data = HashMap<String, Any>()
                             data["lastMessage"] = message
                             data["timestamp"] = timestamp
                             data["from"] = user!!.uid
+                            data["status"] = myUser!!.Gender==withGender
                             query.updateChildren(data)
                         }
                     }
@@ -280,6 +331,18 @@ class Messages : AppCompatActivity() {
 
 
 
+    }
+
+    fun hideKeyboard(activity: Activity) {
+        val imm =  activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
+        //Find the currently focused view, so we can grab the correct window token from it.
+        var view = activity.currentFocus
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = View(activity)
+        }
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
     private fun dptopx(dp:Int):Int{

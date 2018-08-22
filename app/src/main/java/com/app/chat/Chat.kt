@@ -28,6 +28,7 @@ import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.chatbox_layout.view.*
 import kotlinx.android.synthetic.main.fragment_chat.*
 import kotlinx.android.synthetic.main.fragment_chat.view.*
+import org.json.JSONArray
 import java.util.*
 
 
@@ -67,6 +68,19 @@ class Chat : Fragment() {
         ){
 
             override fun populateViewHolder(viewHolder: ChatBoxViewHolder?, model: ChatBoxModel?, position: Int) {
+
+                var gender:String?=null
+                FirebaseDatabase.getInstance().getReference("users/${model!!.withId}").addListenerForSingleValueEvent(object:ValueEventListener{
+                    override fun onCancelled(p0: DatabaseError?) {}
+                    override fun onDataChange(snap: DataSnapshot?) {
+                        val data = snap!!.child("gender").getValue(String::class.java)
+                        gender = data
+                    }
+
+                })
+
+
+
                 rootView.loader.visibility = View.GONE
                 rootView.startNewChat.visibility = View.GONE
                 viewHolder!!.itemView.chatBoxMessage.text = model!!.lastMessage
@@ -91,6 +105,10 @@ class Chat : Fragment() {
                     intent.putExtra("withName",model.withName)
                     intent.putExtra("withPhoto",model.photo)
                     intent.putExtra("chatId",model.id)
+                    intent.putExtra("gender",gender)
+
+
+
                     startActivity(intent)
                 }
             }

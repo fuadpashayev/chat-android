@@ -3,82 +3,50 @@ package com.app.chat
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.Fragment
-import android.support.v7.widget.RecyclerView
 import android.util.Log
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.firebase.ui.database.FirebaseRecyclerAdapter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.*
-import kotlinx.android.synthetic.main.fragment_contacts.view.*
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import kotlinx.android.synthetic.main.fragment_contact_all.view.*
 import kotlinx.android.synthetic.main.user_layout.view.*
 
-
-class Contacts : Fragment() {
-    private var auth:FirebaseAuth? = null
-    private var user:FirebaseUser?=null
+class ContactFemale : Fragment() {
+    private var auth: FirebaseAuth? = null
+    private var user: FirebaseUser?=null
     var myUser:UsersModel?=null
-    private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
-        when (item.itemId) {
-            R.id.navigation_all -> {
-                callFragment("all")
-                return@OnNavigationItemSelectedListener true
-            }
-            R.id.navigation_male -> {
-                callFragment("male")
-                return@OnNavigationItemSelectedListener true
-            }
-            R.id.navigation_female -> {
-                callFragment("female")
-                return@OnNavigationItemSelectedListener true
-            }
-        }
-        false
-    }
-
-    fun callFragment(fragmentName:String?){
-        val manager = fragmentManager
-        val transaction = manager!!.beginTransaction()
-        val fragment = when(fragmentName){
-            "all"->ContactAll()
-            "male"->ContactMale()
-            "female"->ContactFemale()
-            else->ContactAll()
-        }
-        transaction.setCustomAnimations(android.R.anim.fade_in,android.R.anim.fade_out)
-        val currentFragment = manager.findFragmentByTag(fragmentName)
-        if(currentFragment==null)
-            transaction.replace(R.id.main_frame,fragment,fragmentName).commit()
-    }
-
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_contacts, container, false)
+        val rootView = inflater.inflate(R.layout.fragment_contact_all, container, false)
         auth = FirebaseAuth.getInstance()
         user = auth!!.currentUser
         FirebaseDatabase.getInstance().getReference("users/${user!!.uid}").addListenerForSingleValueEvent(object:ValueEventListener{
             override fun onCancelled(p0: DatabaseError?) {}
             override fun onDataChange(snap: DataSnapshot?) {
-                myUser = snap!!.getValue(UsersModel::class.java)
+               myUser = snap!!.getValue(UsersModel::class.java)
             }
         })
-        rootView.contactNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+
+
+
         val query = FirebaseDatabase.getInstance().getReference("users")
 
 
-        query!!.limitToLast(2).addListenerForSingleValueEvent(object:ValueEventListener{
+        query!!.orderByChild("gender").equalTo("Female").limitToLast(2).addListenerForSingleValueEvent(object: ValueEventListener {
             override fun onCancelled(p0: DatabaseError?) {}
 
             override fun onDataChange(snap: DataSnapshot?) {
-                if(!snap!!.exists() || snap.childrenCount==1L){
+                if(!snap!!.exists() || (snap.childrenCount==1L && myUser!!.Gender=="Female")){
                     rootView.loader.visibility = View.GONE
                     rootView.noContacts.visibility = View.VISIBLE
                 }else rootView.noContacts.visibility = View.GONE
@@ -86,15 +54,15 @@ class Contacts : Fragment() {
 
         })
 
-        val contactsAdapter = object : FirebaseRecyclerAdapter<UsersModel, UsersViewHolder>(
+        val contactsAdapter = object : FirebaseRecyclerAdapter<UsersModel, Contacts.UsersViewHolder>(
                 UsersModel::class.java,
                 R.layout.user_layout,
-                UsersViewHolder::class.java,
-                query
+                Contacts.UsersViewHolder::class.java,
+                query.orderByChild("gender").equalTo("Female")
 
         ){
 
-            override fun populateViewHolder(viewHolder: UsersViewHolder?, model: UsersModel?, position: Int) {
+            override fun populateViewHolder(viewHolder: Contacts.UsersViewHolder?, model: UsersModel?, position: Int) {
                 rootView.loader.visibility = View.GONE
                 if(model!!.Id!=user!!.uid) {
 
@@ -118,7 +86,7 @@ class Contacts : Fragment() {
                         intent.putExtra("withPhoto",model.Photo)
                         var chatId = "0"
                         rootView.loader.visibility = View.VISIBLE
-                        FirebaseDatabase.getInstance().getReference("users/${user!!.uid}/chats").orderByChild("withId").equalTo(model.Id).addListenerForSingleValueEvent(object:ValueEventListener{
+                        FirebaseDatabase.getInstance().getReference("users/${user!!.uid}/chats").orderByChild("withId").equalTo(model.Id).addListenerForSingleValueEvent(object: ValueEventListener {
                             override fun onCancelled(p0: DatabaseError?) {}
                             override fun onDataChange(snap: DataSnapshot?) {
                                 if(snap!!.exists()){
@@ -159,12 +127,6 @@ class Contacts : Fragment() {
 
         return rootView
     }
-    fun dptopx(dp:Int):Int{
-        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp.toFloat(),resources.displayMetrics))
-    }
-
-
-    class UsersViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView!!)
 
 
 }

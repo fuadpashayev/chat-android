@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     android:id="@+id/messageBubble"
     android:padding="2dp"
+    android:background="@drawable/message_all_selector"
     android:paddingStart="5dp">
 
 
@@ -69,10 +70,9 @@
         android:layout_width="35dp"
         android:layout_height="35dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="2dp"
+        android:background="@drawable/image_round"
         android:elevation="1dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/image_round" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

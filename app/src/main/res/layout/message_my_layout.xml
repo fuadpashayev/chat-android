@@ -2,19 +2,21 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/messageBubble"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="2dp"
+    android:background="@drawable/message_all_selector"
+    android:paddingBottom="3dp"
     android:paddingEnd="10dp"
-    android:id="@+id/messageBubble"
-    android:paddingStart="65dp">
+    android:paddingStart="65dp"
+    android:paddingTop="3dp">
 
 
     <FrameLayout
+        android:id="@+id/messageFor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:id="@+id/messageFor"
         android:background="@drawable/message_my_border"
         android:backgroundTint="#ededed"
         android:clickable="true"
