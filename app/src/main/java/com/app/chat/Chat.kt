@@ -1,6 +1,9 @@
 package com.app.chat
 
 
+import android.app.AlertDialog
+import android.app.Dialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.PorterDuff
@@ -9,6 +12,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.v4.app.Fragment
 import android.support.v7.widget.RecyclerView
+import android.text.Html
 import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -30,6 +34,8 @@ import kotlinx.android.synthetic.main.fragment_chat.*
 import kotlinx.android.synthetic.main.fragment_chat.view.*
 import org.json.JSONArray
 import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 
 class Chat : Fragment() {
@@ -98,6 +104,48 @@ class Chat : Fragment() {
                         .crossFade(1000)
                         .into(imgHolder)
                 viewHolder.itemView.chatBoxName.text = model.withName
+
+                viewHolder.itemView.setOnLongClickListener {
+                    val dialog = AlertDialog.Builder(activity,R.style.DialogTheme)
+                    val items = arrayOf<String>("Clear Chat","Delete Chat")
+                    dialog.setCancelable(true)
+                    dialog.setNegativeButton("Cancel",{_,_->})
+                    dialog.setItems(items){_,item->
+                        when(item){
+                            0->{
+                                val inDialog = AlertDialog.Builder(activity,R.style.DialogTheme)
+                                inDialog.setCancelable(true)
+                                inDialog.setTitle(Html.fromHtml("<font color='#333'>Are you sure to clear chat?</font>"))
+                                inDialog.setNegativeButton("Cancel",{_,_->})
+                                inDialog.setPositiveButton("Yes") {_,_->
+                                    val data = HashMap<String,Any>()
+                                    data["lastMessage"] = ""
+                                    FirebaseDatabase.getInstance().getReference("messages/${model.id}").removeValue()
+                                    FirebaseDatabase.getInstance().getReference("users/${user!!.uid}/chats/${model.id}").updateChildren(data)
+                                    FirebaseDatabase.getInstance().getReference("users/${model.withId}/chats/${model.id}").updateChildren(data)
+                                }
+                                inDialog.create().show()
+                            }
+                            1->{
+                                val inDialog = AlertDialog.Builder(activity,R.style.DialogTheme)
+                                inDialog.setCancelable(true)
+                                inDialog.setTitle(Html.fromHtml("<font color='#333'>Are you sure to delete chat?</font>"))
+                                inDialog.setNegativeButton("Cancel",{_,_->})
+                                inDialog.setPositiveButton("Yes") {_,_->
+                                    FirebaseDatabase.getInstance().getReference("messages/${model.id}").removeValue()
+                                    FirebaseDatabase.getInstance().getReference("users/${user!!.uid}/chats/${model.id}").removeValue()
+                                    FirebaseDatabase.getInstance().getReference("users/${model.withId}/chats/${model.id}").removeValue()
+                                }
+                                inDialog.create().show()
+                            }
+                        }
+                    }
+                    dialog.create().show()
+
+
+                    true
+                }
+
                 viewHolder.itemView.setOnClickListener {
                     (activity as Home).changeActivity = true
                     val intent = Intent(activity,Messages::class.java)

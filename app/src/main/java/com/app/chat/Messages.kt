@@ -62,18 +62,18 @@ class Messages : AppCompatActivity() {
         FirebaseDatabase.getInstance().getReference("users/${user!!.uid}/chats/$chatId").addValueEventListener(object:ValueEventListener{
             override fun onCancelled(p0: DatabaseError?) {}
             override fun onDataChange(snap: DataSnapshot?) {
-                val data = snap!!.getValue(ChatBoxModel::class.java)!!
-                val status = data.status!!
-                if(data.from==user!!.uid && !status){
+                val data = snap?.getValue(ChatBoxModel::class.java)
+                val status = data?.status
+                if(data?.from==user!!.uid && status==false){
                     hideKeyboard(this@Messages)
                     sendBoxArea.visibility = View.GONE
                     requestMyText.text = Html.fromHtml("<font color='#000000'><b>$withName</b></font> has not accepted your request yet.")
                     requestMyBody.visibility = View.VISIBLE
-                }else if(data.from!=user!!.uid && !status){
+                }else if(data?.from!=user!!.uid && status==false){
                     sendBoxArea.visibility = View.GONE
                     requestText.text = Html.fromHtml("<font color='#000000'><b>$withName</b></font> wants to send you message.")
                     requestBody.visibility = View.VISIBLE
-                }else if(status){
+                }else if(status==true){
                     requestBody.visibility = View.GONE
                     messageBox.requestFocus()
                     window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)

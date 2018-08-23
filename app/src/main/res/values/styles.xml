@@ -14,6 +14,7 @@
     </style>
     <style name="DialogTheme" parent="ThemeOverlay.AppCompat.Dialog">
         <item name="android:textColor">@color/colorPrimary</item>
+
     </style>
 
 </resources>
