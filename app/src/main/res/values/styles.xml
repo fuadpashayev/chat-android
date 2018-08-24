@@ -8,13 +8,19 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowTranslucentNavigation">false</item>
     </style>
+
     <style name="tabTextAppearance" parent="TextAppearance.Design.Tab">
         <item name="textAllCaps">false</item>
         <item name="android:textAllCaps">false</item>
     </style>
+
     <style name="DialogTheme" parent="ThemeOverlay.AppCompat.Dialog">
         <item name="android:textColor">@color/colorPrimary</item>
+    </style>
 
+    <style name="PopupAnimation">
+        <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
+        <item name="android:windowExitAnimation">@android:anim/fade_out</item>
     </style>
 
 </resources>
