@@ -13,6 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="50dp"
+        android:layout_marginTop="15dp"
         android:background="@drawable/profile_selector"
         android:backgroundTint="#ffffff"
         android:padding="8dp"
@@ -26,6 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="50dp"
+        android:layout_marginTop="15dp"
         android:background="@drawable/profile_selector"
         android:backgroundTint="#ffffff"
         android:padding="8dp"
@@ -34,17 +36,39 @@
         app:layout_constraintEnd_toStartOf="@+id/profileImage"
         app:layout_constraintTop_toTopOf="@+id/profileImage" />
 
-    <ImageView
+    <RelativeLayout
+        android:layout_width="wrap_content"
         android:id="@+id/profileImage"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_marginTop="10dp"
-        android:adjustViewBounds="true"
-        android:background="@drawable/profile_image"
-        android:scaleType="centerInside"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/profileImageOld"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_marginTop="10dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/profile_image"
+            android:scaleType="centerInside"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+        <ImageView
+            android:id="@+id/profileImageNew"
+            android:visibility="gone"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_marginTop="10dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/profile_image"
+            android:scaleType="centerInside"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </RelativeLayout>
+
+
 
 
     <android.support.constraint.ConstraintLayout
