@@ -42,11 +42,11 @@ class Home : AppCompatActivity() {
     fun updateExit(type:String){
         val query = FirebaseDatabase.getInstance().getReference("users/${user!!.uid}/exit")
         var tm:Int?=null
-        if(type=="exit"){
+        tm = if(type=="exit"){
             val time = (System.currentTimeMillis()/1000).toInt()
-            tm = time
+            time
         }else{
-            tm = 0
+            0
         }
         query.setValue(tm)
     }

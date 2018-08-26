@@ -40,9 +40,11 @@
         android:layout_width="wrap_content"
         android:id="@+id/profileImage"
         app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_height="wrap_content">
+
         <ImageView
             android:id="@+id/profileImageOld"
             android:layout_width="150dp"
@@ -50,7 +52,7 @@
             android:layout_marginTop="10dp"
             android:adjustViewBounds="true"
             android:background="@drawable/profile_image"
-            android:scaleType="centerInside"
+            android:scaleType="centerCrop"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -62,10 +64,20 @@
             android:layout_marginTop="10dp"
             android:adjustViewBounds="true"
             android:background="@drawable/profile_image"
-            android:scaleType="centerInside"
+            android:scaleType="centerCrop"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <ProgressBar
+            android:id="@+id/imageLoadBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="135dp"
+            android:layout_height="wrap_content"
+            android:elevation="3dp"
+            android:visibility="gone"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true" />
     </RelativeLayout>
 
 

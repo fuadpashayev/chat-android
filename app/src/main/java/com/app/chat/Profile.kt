@@ -2,20 +2,20 @@ package com.app.chat
 
 
 
-import android.app.Activity
 import android.app.Activity.RESULT_CANCELED
-import android.app.ProgressDialog
-import android.app.ProgressDialog.*
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Context.LAYOUT_INFLATER_SERVICE
+import android.content.DialogInterface
 import android.content.Intent
 import android.database.Cursor
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.Matrix
 import android.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.provider.MediaStore
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
@@ -31,11 +31,8 @@ import android.view.animation.Animation
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupWindow
-import android.widget.Toast
-import com.android.volley.AuthFailureError
 import com.android.volley.Request
 import com.android.volley.Response
-import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
@@ -51,9 +48,7 @@ import kotlinx.android.synthetic.main.fragment_profile.*
 import kotlinx.android.synthetic.main.fragment_profile.view.*
 import kotlinx.android.synthetic.main.popup.view.*
 import java.io.ByteArrayOutputStream
-import java.util.*
 import kotlin.collections.HashMap
-import id.zelory.compressor.*
 import java.io.File
 
 
@@ -78,9 +73,7 @@ open class Profile : Fragment() {
                 Glide.with(context!!)
                         .load(myUser!!.Photo)
                         .thumbnail(Glide.with(context).load(R.mipmap.loader))
-                        .fitCenter()
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .centerCrop()
                         .crossFade()
                         .into(imgHolder)
 
@@ -115,37 +108,114 @@ open class Profile : Fragment() {
 
         })
 
-        rootView.imageActions.setOnClickListener {
-            val photoPickerIntent = Intent(Intent.ACTION_PICK)
-            photoPickerIntent.type = "image/*"
-            startActivityForResult(photoPickerIntent, 1)
-        }
 
+
+        rootView.imageActions.setOnClickListener {
+            val dialog = AlertDialog.Builder(activity,R.style.DialogTheme)
+            val list = ArrayList<String>()
+            if("noavatar" !in myUser!!.Photo!!){
+                list.add("Change Profile Photo")
+                list.add("Delete Profile Photo")
+            }else{
+                list.add("Add Profile Photo")
+            }
+            val aList = list.toArray(arrayOfNulls<String>(list.size))
+
+            dialog.setItems(aList) { _, item->
+                when(item){
+                    0->{
+                        val photoPickerIntent = Intent(Intent.ACTION_PICK)
+                        photoPickerIntent.type = "image/*"
+                        (activity as Home).changeActivity = true
+                        startActivityForResult(photoPickerIntent, 1)
+                    }
+                    1->{
+                        val oldImage = myUser!!.Photo
+                        val newImage = UsersModel().Photo
+                        val url = "http://pashayev.info/chat/delete.php?image=$oldImage"
+                        Volley.newRequestQueue(activity).add(StringRequest(Request.Method.GET,url,Response.Listener{
+                            Log.d("--------response",it)
+                        },Response.ErrorListener{}))
+                        val data = HashMap<String,Any>()
+                        data["photo"] = newImage!!
+                        FirebaseDatabase.getInstance().getReference("users/${user!!.uid}").updateChildren(data)
+                        Glide.with(context!!)
+                                .load(newImage)
+                                .thumbnail(Glide.with(context).load(R.mipmap.loader))
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .crossFade()
+                                .into(profileImageNew)
+                    }
+                }
+
+            }
+            dialog.setCancelable(true)
+            dialog.setNegativeButton("Cancel") { _, _->}
+            dialog.create().show()
+
+        }
+/*
+*
+*
+*         val UPLOAD_URL = "http://pashayev.info/chat/index.php"
+        val stringRequest = object : StringRequest(Request.Method.POST, UPLOAD_URL,
+                Response.Listener<String> {
+                    val data = HashMap<String,Any>()
+                    data["photo"] = "http://pashayev.info/chat/$it"
+                    FirebaseDatabase.getInstance().getReference("users/${user!!.uid}").updateChildren(data)
+                },
+                Response.ErrorListener {})
+        }
+        val requestQueue = Volley.newRequestQueue(activity)
+        requestQueue.add(stringRequest)
+*
+*
+* */
 
 
         return rootView
     }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (data!=null && resultCode != RESULT_CANCELED) {
             val image = data.data
             profileImageOld.fadeOut()
+            profileImageNew.clipToOutline = true
             Glide.with(context!!)
                     .load(image)
                     .thumbnail(Glide.with(context).load(R.mipmap.loader))
-                    .fitCenter()
-                    .centerCrop()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .crossFade()
                     .into(profileImageNew)
-            profileImageNew.clipToOutline = true
-            profileImageNew.fadeIn()
 
+            profileImageNew.fadeIn()
             val path = getPath(context!!,image as Uri)
             var bitmap = image.bitmap()
             val file = File(path)
             bitmap = bitmap.fixOrientation(file)
             uploadImage(bitmap)
+
+
+            var progressStatus = 0
+            val handler = Handler()
+            imageLoadBar.visibility = View.VISIBLE
+            imageLoadBar.progressDrawable.setColorFilter(Color.rgb(63,81,181), android.graphics.PorterDuff.Mode.SRC_IN)
+            Thread(Runnable {
+                while (progressStatus < 100) {
+                    progressStatus += 1
+                    try {
+                        Thread.sleep(35)
+                    } catch (e:InterruptedException) {
+                        e.printStackTrace()
+                    }
+                    handler.post {
+                        imageLoadBar.progress = progressStatus
+                        if(progressStatus==100)
+                            imageLoadBar.visibility = View.GONE
+                    }
+                }
+            }).start()
+
+
         }
         super.onActivityResult(requestCode, resultCode, data)
     }
@@ -162,7 +232,7 @@ open class Profile : Fragment() {
     }
 
     fun getStringImage(bitmap: Bitmap):String {
-        val compressedBitmap = bitmap.scale(300,300)
+        val compressedBitmap = bitmap.scale(200.dp,300)
         val baos = ByteArrayOutputStream()
         compressedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
         val imageBytes = baos.toByteArray()
@@ -180,17 +250,16 @@ open class Profile : Fragment() {
             3 -> matrix.postRotate(180F)
             8 -> matrix.postRotate(270F)
         }
-        return Bitmap.createBitmap(this, 0, 0, this.width, this.height, matrix, true) // rotating bitmap
-        // rotating bitmap
+        return Bitmap.createBitmap(this, 0, 0, this.width, this.height, matrix, true)
+
     }
+
 
 
     private fun uploadImage(bitmap: Bitmap) {
         val UPLOAD_URL = "http://pashayev.info/chat/index.php"
-        val loading = show(activity, "Uploading...", "Please wait...", false, false)
         val stringRequest = object : StringRequest(Request.Method.POST, UPLOAD_URL,
                 Response.Listener<String> {
-                    loading.dismiss()
                     val data = HashMap<String,Any>()
                     data["photo"] = "http://pashayev.info/chat/$it"
                     FirebaseDatabase.getInstance().getReference("users/${user!!.uid}").updateChildren(data)
@@ -200,12 +269,14 @@ open class Profile : Fragment() {
                 val image = getStringImage(bitmap)
                 val params = HashMap<String, String>()
                 params["image"] = image
+                params["old_image"] = myUser!!.Photo!!
                 return params
 
             }
         }
         val requestQueue = Volley.newRequestQueue(activity)
         requestQueue.add(stringRequest)
+
 
     }
 
@@ -223,9 +294,7 @@ open class Profile : Fragment() {
     }
 
 
-    fun dptopx(dp:Int):Int{
-        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp.toFloat(),resources.displayMetrics))
-    }
+    val Int.dp: Int get() = (this * resources.displayMetrics.density).toInt()
 
     private fun ImageView.fadeOut() {
         val fadeOut = AlphaAnimation(1f, 0f)
@@ -242,9 +311,9 @@ open class Profile : Fragment() {
     }
 
     private fun ImageView.fadeIn() {
-        val fadeOut = AlphaAnimation(0f, 1f)// 0,1 shows the layout 1,0 hides layout
+        val fadeOut = AlphaAnimation(0f, 1f)
         fadeOut.interpolator = AccelerateInterpolator()
-        fadeOut.duration = 500// time to show or hide an element
+        fadeOut.duration = 500
         fadeOut.setAnimationListener(object:Animation.AnimationListener {
             override fun onAnimationEnd(animation:Animation) {
                 this@fadeIn.visibility = View.VISIBLE
