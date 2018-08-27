@@ -139,6 +139,7 @@ class messageAdapter(var messagesList:ArrayList<MessageModel>,var withPhoto:Stri
             val clip = ClipData.newPlainText("Copied Message", messagesList[position].message)
             clipboard!!.primaryClip = clip
             Toast.makeText(messagesActivity,"Message copied",Toast.LENGTH_SHORT).show()
+            messagesActivity.closeMessageActions.callOnClick()
         }
         messagesActivity.deleteMessage.setOnClickListener {
             val dialog = AlertDialog.Builder(messagesActivity,R.style.DialogTheme)
@@ -161,7 +162,8 @@ class messageAdapter(var messagesList:ArrayList<MessageModel>,var withPhoto:Stri
                     FirebaseDatabase.getInstance().getReference("users/${nlm.toId}/chats/$chatId").updateChildren(newData)
                 }
                 messagesList.removeAt(position)
-                notifyItemRemoved(position)
+                messages.adapter = messageAdapter(messagesList,withPhoto,messagesActivity,messages,chatId)
+               // notifyItemRemoved(position)
                 if(beforeView!=null){
                     messagesActivity.closeMessageActions.callOnClick()
                     beforeView=null

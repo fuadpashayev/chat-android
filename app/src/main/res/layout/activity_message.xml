@@ -4,9 +4,39 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/msg_bg"
-
     tools:context=".Messages">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@mipmap/msg_back"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"
+        />
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/messageLoader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_below="@id/messageStatusBar"
+        android:layout_marginTop="60dp"
+        android:padding="10dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ProgressBar
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:indeterminateTint="@color/colorPrimary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/messageStatusBar"
@@ -135,8 +165,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/sendBoxArea"
+        android:layout_below="@id/messageLoader"
         android:layout_marginBottom="0dp"
-        android:layout_marginTop="60dp"
+
         app:layoutManager="android.support.v7.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@+id/sendBoxArea"
         app:layout_constraintEnd_toEndOf="parent"
@@ -275,6 +306,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Ignore"
+            android:layout_marginTop="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:background="?android:selectableItemBackground"
@@ -290,7 +322,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
-        android:background="@drawable/msg_bg"
         android:visibility="gone">
 
         <TextView

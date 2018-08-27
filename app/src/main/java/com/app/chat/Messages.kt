@@ -46,6 +46,7 @@ class Messages : AppCompatActivity() {
     var initialLoad = false
     var changeActivity = false
     var childAdded=false
+    var alerting = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_message)
@@ -77,6 +78,11 @@ class Messages : AppCompatActivity() {
                     requestBody.visibility = View.GONE
                     messageBox.requestFocus()
                     window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
+                    if(data.from==user!!.uid && alerting==1){
+                        requestMyBody.visibility = View.GONE
+                        sendBoxArea.visibility = View.VISIBLE
+                        Toast.makeText(this@Messages,Html.fromHtml("<font color='#ffffff'><b>$withName</b></font> accepted your request."),Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
 
@@ -84,6 +90,7 @@ class Messages : AppCompatActivity() {
 
 
         requestAccept.setOnClickListener {
+            alerting++
             val statusData = HashMap<String,Any>()
             statusData["status"]=true
             FirebaseDatabase.getInstance().getReference("users/${user!!.uid}/chats/$chatId").updateChildren(statusData)
@@ -92,7 +99,7 @@ class Messages : AppCompatActivity() {
             sendBoxArea.visibility = View.VISIBLE
             messageBox.requestFocus()
             window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
-            Toast.makeText(this,Html.fromHtml("You accepted <font color='#000000'><b>$withName's</b></font> request"),Toast.LENGTH_SHORT).show()
+            Toast.makeText(this,Html.fromHtml("You accepted <font color='#ffffff'><b>$withName's</b></font> request"),Toast.LENGTH_SHORT).show()
         }
 
         requestDecline.setOnClickListener {
@@ -132,7 +139,7 @@ class Messages : AppCompatActivity() {
             }
 
         })
-        query.addChildEventListener(object:ChildEventListener{
+        query.limitToLast(20).addChildEventListener(object:ChildEventListener{
             override fun onChildAdded(snap: DataSnapshot?, p1: String?) {
                 initialLoad = true
                 loader.visibility = View.GONE
@@ -254,7 +261,36 @@ class Messages : AppCompatActivity() {
                 val scrollHeight = messages.computeVerticalScrollOffset()
                 if(dy<0 && scrollHeight==0 && !loading){
                     loading = true
-                   // Log.d("------aaa","HOPPAAA YUKLEME BASLADI")
+                    messageLoader.visibility = View.VISIBLE
+                    //Log.d("------aaa","HOPPAAA YUKLEME BASLADI")
+                    val firstMessage = messageAdapterList[0].timestamp!!.toDouble()
+                    FirebaseDatabase.getInstance().getReference("messages/$chatId").orderByChild("timestamp").endAt(firstMessage).limitToLast(20).addListenerForSingleValueEvent(object:ValueEventListener{
+                        override fun onCancelled(p0: DatabaseError?) {}
+                        override fun onDataChange(snap: DataSnapshot?) {
+//                            Log.d("-------a",snap.toString())
+                            val newDataList = ArrayList<MessageModel>()
+                            for(datas in snap!!.children){
+                                val data = datas!!.getValue(MessageModel::class.java)
+                                if(data!!.timestamp!=firstMessage.toLong()){
+                                    if(messageAdapterList[0].timestamp!=data.timestamp) {
+                                        messageLoader.visibility = View.GONE
+                                        Log.d("---------a",data.message+" - "+data)
+                                        newDataList.add(data)
+                                        //messages.adapter!!.notifyDataSetChanged()
+                                    }
+                                }
+
+
+                            }
+                            newDataList.addAll(messageAdapterList)
+                            messages.adapter = messageAdapter(newDataList, withPhoto, this@Messages, messages, chatId)
+                            messages.scrollToPosition(newDataList.size-21)
+                        }
+
+                    })
+
+
+
                     loading = false
                 }
                 visibleItemCount = mLayoutManager.childCount
@@ -274,6 +310,7 @@ class Messages : AppCompatActivity() {
 
 
         sendMessage.setOnClickListener {
+            alerting++
             childAdded=true
             val message = messageBox.text.trim().toString()
             if(((initialLoad && messageAdapterList.size>0) || (!initialLoad && messageAdapterList.size<=0)) && message.count()>0) {
@@ -286,10 +323,12 @@ class Messages : AppCompatActivity() {
                         myUser = snap!!.getValue(UsersModel::class.java)
                         val uquery = FirebaseDatabase.getInstance().getReference("users/${user!!.uid}/chats/$chatId")
                         val data = HashMap<String, Any>()
+                        val messageCount = snap.child("chats/$chatId/messageCount").getValue(Int::class.java)!!
                         data["lastMessage"] = message
                         data["timestamp"] = timestamp
                         data["from"] = user!!.uid
-                        data["status"] = myUser!!.Gender==withGender
+                        data["status"] = if(messageCount==0) myUser!!.Gender==withGender else true
+                        data["messageCount"] = messageCount+1
                         uquery.updateChildren(data)
 
 
@@ -309,14 +348,16 @@ class Messages : AppCompatActivity() {
                         if(!snap!!.child("chats/$chatId").exists()){
                             val query = FirebaseDatabase.getInstance().getReference("users/$withId/chats/$chatId")
                             val status = withGender==myUser!!.Gender
-                            query.setValue(ChatBoxModel(message,timestamp,myUser!!.Id,myUser!!.Name,myUser!!.Photo,keyChat,user!!.uid,status))
+                            query.setValue(ChatBoxModel(message,timestamp,myUser!!.Id,myUser!!.Name,myUser!!.Photo,keyChat,user!!.uid,status,1))
                         }else {
                             val query = FirebaseDatabase.getInstance().getReference("users/$withId/chats/$chatId")
                             val data = HashMap<String, Any>()
+                            val messageCount = snap.child("chats/$chatId/messageCount").getValue(Int::class.java)!!
                             data["lastMessage"] = message
                             data["timestamp"] = timestamp
                             data["from"] = user!!.uid
-                            data["status"] = myUser!!.Gender==withGender
+                            data["status"] = if(messageCount==0) myUser!!.Gender==withGender else true
+                            data["messageCount"] = snap.child("chats/$chatId/messageCount").getValue(Int::class.java)!!+1
                             query.updateChildren(data)
                         }
                     }

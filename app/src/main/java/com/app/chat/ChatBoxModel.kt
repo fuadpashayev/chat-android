@@ -10,8 +10,9 @@ class ChatBoxModel {
     var id:String?=null
     var from:String?=null
     var status:Boolean?=null
+    var messageCount:Int?=null
     constructor(){}
-    constructor(lastMessage:String?,timestamp:Long?,withId:String?,withName:String?,photo:String?,id:String?,from:String?,status:Boolean?){
+    constructor(lastMessage:String?,timestamp:Long?,withId:String?,withName:String?,photo:String?,id:String?,from:String?,status:Boolean?,messageCount:Int?){
         this.lastMessage = lastMessage
         this.timestamp = timestamp
         this.withId = withId
@@ -20,5 +21,6 @@ class ChatBoxModel {
         this.id = id
         this.from = from
         this.status = status
+        this.messageCount = messageCount
     }
 }

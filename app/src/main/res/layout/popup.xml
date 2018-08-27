@@ -7,78 +7,70 @@
     android:background="#ffffff">
 
     <android.support.constraint.ConstraintLayout
-        android:layout_width="match_parent"
         android:id="@+id/popupHeader"
-        android:background="@drawable/border_bottom_light"
-        android:layout_height="70dp">
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        android:backgroundTint="@color/colorPrimary"
+        app:layout_constraintStart_toStartOf="parent">
 
         <ImageButton
             android:id="@+id/closeProfileActions"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:background="#ffffff"
-            android:foreground="?android:selectableItemBackground"
-            android:src="@drawable/ic_close"
-            android:scaleType="fitCenter"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="?android:selectableItemBackground"
             android:padding="18dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_close"
+            android:tint="#ffffff"
+            android:clickable="true"
+            android:focusable="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_close" />
 
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:text="Actions"
-            android:textColor="#000000"
-            android:textSize="17sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
 
 
-
     <TextView
+        android:id="@+id/menu1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:background="@drawable/border_bottom"
-        android:foreground="?android:selectableItemBackground"
         android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:selectableItemBackground"
         android:padding="25dp"
         android:text="menu1"
-        android:id="@+id/menu1"
+        android:textColor="#333333"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/popupHeader"
-        android:focusable="true" />
+        app:layout_constraintTop_toBottomOf="@+id/popupHeader" />
 
     <TextView
+        android:id="@+id/exitChat"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:background="@drawable/border_bottom"
-        android:foreground="?android:selectableItemBackground"
         android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:selectableItemBackground"
         android:padding="25dp"
         android:text="Log Out"
-        android:id="@+id/exitChat"
+        android:textColor="#333333"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/menu1"
-        android:focusable="true" />
+        app:layout_constraintTop_toBottomOf="@+id/menu1" />
 
 
 </android.support.constraint.ConstraintLayout>

@@ -129,8 +129,7 @@ class Contacts : Fragment() {
                                     val query = FirebaseDatabase.getInstance().getReference("users/${user!!.uid}/chats").push()
                                     chatId=query.key
                                     val timestamp = System.currentTimeMillis()/100
-                                    val status = model.Gender==myUser!!.Gender
-                                    query.setValue(ChatBoxModel("",timestamp,model.Id,model.Name,model.Photo,chatId,user!!.uid,true))
+                                    query.setValue(ChatBoxModel("",timestamp,model.Id,model.Name,model.Photo,chatId,user!!.uid,true,0))
                                 }
                                 rootView.loader.visibility = View.GONE
                                 intent.putExtra("chatId",chatId)

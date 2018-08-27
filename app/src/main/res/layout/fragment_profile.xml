@@ -2,9 +2,9 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/profileArea"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/profileArea"
     tools:context=".Chat">
 
 
@@ -17,7 +17,7 @@
         android:background="@drawable/profile_selector"
         android:backgroundTint="#ffffff"
         android:padding="8dp"
-        android:src="@drawable/ic_more"
+        android:src="@drawable/ic_settings"
         android:tint="@color/colorPrimary"
         app:layout_constraintStart_toEndOf="@+id/profileImage"
         app:layout_constraintTop_toTopOf="@+id/profileImage" />
@@ -37,13 +37,13 @@
         app:layout_constraintTop_toTopOf="@+id/profileImage" />
 
     <RelativeLayout
-        android:layout_width="wrap_content"
         android:id="@+id/profileImage"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_height="wrap_content">
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/profileImageOld"
@@ -56,15 +56,16 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
         <ImageView
             android:id="@+id/profileImageNew"
-            android:visibility="gone"
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_marginTop="10dp"
             android:adjustViewBounds="true"
             android:background="@drawable/profile_image"
             android:scaleType="centerCrop"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -74,20 +75,18 @@
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="135dp"
             android:layout_height="wrap_content"
-            android:elevation="3dp"
-            android:visibility="gone"
             android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true" />
+            android:layout_centerVertical="true"
+            android:elevation="3dp"
+            android:visibility="gone" />
     </RelativeLayout>
-
-
 
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/loader"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -107,4 +106,17 @@
             app:layout_constraintTop_toTopOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/profileUserName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="13dp"
+        android:text="User Name"
+        android:textColor="#333333"
+        android:textSize="17sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profileImage" />
 </android.support.constraint.ConstraintLayout>

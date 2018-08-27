@@ -145,7 +145,7 @@
         android:paddingBottom="0dp"
         android:paddingTop="0dp"
         android:scrollbarStyle="outsideOverlay"
-        android:translationX="1000dp"
+        android:translationX="2500dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

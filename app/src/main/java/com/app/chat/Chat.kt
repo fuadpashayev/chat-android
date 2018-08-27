@@ -89,7 +89,7 @@ class Chat : Fragment() {
 
                 rootView.loader.visibility = View.GONE
                 rootView.startNewChat.visibility = View.GONE
-                viewHolder!!.itemView.chatBoxMessage.text = model!!.lastMessage
+                viewHolder!!.itemView.chatBoxMessage.text = model.lastMessage
                 if(model.lastMessage=="") viewHolder.itemView.chatBoxMessage.visibility = View.GONE
                 else viewHolder.itemView.chatBoxMessage.visibility = View.VISIBLE
                 val imgHolder = viewHolder.itemView.chatPhoto
